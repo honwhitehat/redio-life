@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Starlite Radio · Lagos</title>
+<meta name="theme-color" content="#3B2414">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --wall:#6E8E89; --wall-shade:#557570;
+  --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
+  --dial-off:#B8AC8C; --ink:#2C1B0F; --needle:#B3281D;
+  --brass:#D2AA62; --brass-dark:#7A5A26; --cloth:#8C7858;
+  --eye:#5DF08C; --hint:#F4EEDF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
+}
+:root[data-theme="dark"]{ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;
+  background:radial-gradient(ellipse at 50% 30%, var(--wall), var(--wall-shade));
+  font-family:"Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);
+}
+.room{min-height:100vh;display:grid;place-items:center;align-content:center;gap:18px;padding:24px 14px}
+.radio{
+  width:min(100%,680px);padding:18px;border-radius:30px 30px 16px 16px;
+  background:
+    repeating-linear-gradient(92deg, rgba(0,0,0,.08) 0 2px, transparent 2px 9px, rgba(255,255,255,.04) 9px 11px, transparent 11px 23px),
+    linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.18), inset 0 -6px 12px rgba(0,0,0,.35), 0 30px 60px rgba(0,0,0,.35);
+}
+.dial{padding:9px;border-radius:14px;background:linear-gradient(180deg,#EBCB86,var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.dial-face{
+  position:relative;height:112px;border-radius:8px;overflow:hidden;cursor:ew-resize;touch-action:none;
+  background:var(--dial-off);box-shadow:inset 0 3px 10px rgba(0,0,0,.35);transition:background .6s, box-shadow .6s;
+}
+.radio[data-on="true"] .dial-face{
+  background:radial-gradient(ellipse at 50% 65%, #FFF0C2, #F3CD6E 55%, #D9A445);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.25), inset 0 0 40px rgba(255,170,40,.55);
+}
+.track{position:absolute;inset:12px 24px}
+.calls span{position:absolute;top:6px;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--ink);opacity:.55}
+.calls span.near{background:var(--needle);opacity:1}
+.scale{position:absolute;left:0;right:0;top:30px;height:50px}
+.tick{position:absolute;top:0;width:1px;height:9px;background:var(--ink)}
+.tick.major{height:17px;width:2px;margin-left:-.5px}
+.num{position:absolute;top:22px;transform:translateX(-50%);font-size:17px;font-weight:600}
+.needle{position:absolute;top:-8px;bottom:-8px;width:3px;margin-left:-1.5px;background:var(--needle);border-radius:2px;box-shadow:0 0 5px rgba(179,40,29,.55)}
+.body{display:grid;grid-template-columns:1fr auto;gap:18px;margin-top:16px}
+.grille{
+  position:relative;min-height:190px;border-radius:12px;
+  background:
+    repeating-linear-gradient(45deg, rgba(0,0,0,.14) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.07) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg,#9B8664,var(--cloth) 60%,#6E5C40);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.55);
+}
+.badge{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font-family:Limelight,Georgia,serif;font-size:28px;color:var(--brass);text-shadow:0 1px 0 rgba(0,0,0,.6),0 0 1px #000;white-space:nowrap}
+.controls{display:flex;flex-direction:column;align-items:center;gap:14px;width:210px}
+.top-row{display:flex;align-items:center;gap:12px;width:100%}
+.eye{
+  --gap:120deg;flex:none;width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle,#2A2A22 0 20%,transparent 21%),#2F332C;
+  box-shadow:0 0 0 4px var(--brass-dark),inset 0 0 8px #000;transition:box-shadow .3s;
+}
+.radio[data-on="true"] .eye{
+  background:
+    radial-gradient(circle,#1C2A1E 0 20%,transparent 21%),
+    conic-gradient(#0E1C12 0 calc(var(--gap)/2), var(--eye) calc(var(--gap)/2) calc(360deg - var(--gap)/2), #0E1C12 calc(360deg - var(--gap)/2));
+  box-shadow:0 0 0 4px var(--brass-dark),inset 0 0 8px #000,0 0 14px rgba(93,240,140,.45);
+}
+.readout{flex:1;min-width:0;padding:7px 10px;border-radius:6px;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);color:#E9C77A}
+.freq{font-size:24px;font-weight:600;line-height:1}
+.freq small{font-size:14px;opacity:.7;margin-left:3px}
+.station{font-size:15px;line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.knobs{display:flex;gap:20px}
+.knob-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;color:#EED9A8;font-size:15px}
+.knob{
+  position:relative;width:76px;height:76px;border-radius:50%;cursor:grab;touch-action:none;
+  background:radial-gradient(circle at 35% 30%,#F3DCA4,var(--brass) 45%,var(--brass-dark));
+  box-shadow:0 5px 9px rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.35);
+}
+.knob:active{cursor:grabbing}
+.knob::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.17) 0 3deg,transparent 3deg 9deg)}
+.knob .cap{position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#F8E7BC,#B88E46)}
+.knob .mark{position:absolute;left:50%;top:6px;width:4px;height:17px;margin-left:-2px;border-radius:2px;background:var(--walnut-dark)}
+.keys{display:flex;gap:7px;margin-top:18px}
+.key{
+  flex:1;min-width:0;height:48px;border:none;border-radius:4px 4px 9px 9px;cursor:pointer;
+  font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);
+  background:linear-gradient(#FBF4E2,#D8C9A4);box-shadow:0 5px 0 #8A7752,0 7px 9px rgba(0,0,0,.4);
+  transition:transform .08s, box-shadow .08s;
+}
+.key:active,.key[aria-pressed="true"]{transform:translateY(4px);box-shadow:0 1px 0 #8A7752,0 2px 4px rgba(0,0,0,.4)}
+.key.wide{flex:1.4}
+.key.power{flex:1.3;background:linear-gradient(#C9493D,#8F2B22);color:#FBEBD5;box-shadow:0 5px 0 #5A1A14,0 7px 9px rgba(0,0,0,.4)}
+.key.power[aria-pressed="true"]{box-shadow:0 1px 0 #5A1A14,0 2px 4px rgba(0,0,0,.4)}
+:focus-visible{outline:3px solid #FFE08A;outline-offset:3px}
+.hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+@media (max-width:560px){
+  .radio{padding:14px;border-radius:24px 24px 14px 14px}
+  .dial-face{height:100px}
+  .track{inset:10px 16px}
+  .num{font-size:14px}
+  .body{grid-template-columns:1fr}
+  .grille{min-height:96px}
+  .badge{font-size:22px;bottom:50%;transform:translate(-50%,50%)}
+  .controls{width:auto}
+  .key{font-size:13px;height:44px}
+}
+@media (prefers-reduced-motion: reduce){ .dial-face,.eye,.key{transition:none} }
+</style>
+</head>
+<body>
+<main class="room">
+  <div class="radio" id="radio" data-on="false">
+    <div class="dial">
+      <div class="dial-face" id="dial" aria-hidden="true">
+        <div class="track" id="track">
+          <div class="calls" id="calls"></div>
+          <div class="scale" id="scale"></div>
+          <div class="needle" id="needle"></div>
+        </div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="grille"><div class="badge">Starlite Lagos</div></div>
+      <div class="controls">
+        <div class="top-row">
+          <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear"></div>
+          <div class="readout" aria-live="polite">
+            <div class="freq"><span id="freq">97.1</span><small>FM</small></div>
+            <div class="station" id="station">Off</div>
+          </div>
+        </div>
+        <div class="knobs">
+          <div class="knob-wrap">
+            <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100"><div class="cap"></div><div class="mark"></div></div>
+            Volume
+          </div>
+          <div class="knob-wrap">
+            <div class="knob" id="tuneKnob" role="slider" tabindex="0" aria-label="Tuning" aria-valuemin="88" aria-valuemax="108"><div class="cap"></div><div class="mark"></div></div>
+            Tuning
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="keys" id="keys">
+      <button class="key" id="seekBack" aria-label="Seek to previous station">◀ Seek</button>
+      <button class="key wide" id="scan" aria-pressed="false">Auto scan</button>
+      <button class="key" id="seekFwd" aria-label="Seek to next station">Seek ▶</button>
+      <button class="key power" id="power" aria-pressed="false">On / off</button>
+    </div>
+  </div>
+  <p class="hint">Switch it on, then press Seek to jump to the next Lagos station or Auto scan to hop through them all. Turning the knob works too, and it snaps onto a station when you let go. Stations play live over the internet, so you'll need data or Wi-Fi. Faded dots on the dial aren't streaming right now.</p>
+</main>
+
+<script>
+/* Starlite Lagos: live streaming radio.
+   Stream links are looked up at runtime from the free Radio Browser directory (radio-browser.info),
+   so they stay current. Found links are cached on the phone for a week. */
+const STATIONS = [
+  { f: 88.9,  name: 'Brila FM',       q: ['Brila'] },
+  { f: 89.7,  name: 'Eko FM',         q: ['Eko FM'] },
+  { f: 91.3,  name: 'Lagos Talks',    q: ['Lagos Talks'] },
+  { f: 92.3,  name: 'Inspiration FM', q: ['Inspiration FM', 'Inspiration 92.3'] },
+  { f: 92.9,  name: 'Bond FM',        q: ['Bond FM'] },
+  { f: 93.7,  name: 'Rhythm FM',      q: ['Rhythm 93.7', 'Rhythm FM'] },
+  { f: 95.1,  name: 'Wazobia FM',     q: ['Wazobia'] },
+  { f: 96.5,  name: 'Urban96',        q: ['Urban96', 'Urban 96'] },
+  { f: 96.9,  name: 'Cool FM',        q: ['Cool FM', 'Cool 96.9'] },
+  { f: 97.3,  name: 'Classic FM',     q: ['Classic FM 97.3', 'Classic 97.3'] },
+  { f: 97.7,  name: 'Metro FM',       q: ['Metro FM 97.7', 'Metro FM'] },
+  { f: 98.1,  name: 'Smooth FM',      q: ['Smooth 98.1', 'Smooth FM'] },
+  { f: 98.5,  name: 'Soundcity',      q: ['Soundcity', 'Sound City'] },
+  { f: 99.3,  name: 'Nigeria Info',   q: ['Nigeria Info'] },
+  { f: 99.9,  name: 'Beat FM',        q: ['Beat 99.9', 'Beat FM'] },
+  { f: 100.5, name: 'Raypower',       q: ['Raypower', 'Ray Power'] },
+  { f: 102.3, name: 'Max FM',         q: ['Max FM', 'Max 102.3'] },
+  { f: 103.5, name: 'Radio One',      q: ['Radio One 103.5', 'Radio One'] },
+  { f: 105.3, name: 'Fresh FM',       q: ['Fresh FM Lagos', 'Fresh 105.3'] },
+  { f: 107.5, name: 'Radio Lagos',    q: ['Radio Lagos'] },
+];
+STATIONS.forEach(s => { s.urls = []; s.ui = 0; });
+const MIN = 88, MAX = 108, WIDTH = 0.18;
+const API = ['de1', 'de2', 'fi1', 'nl1', 'at1'].map(h => `https://${h}.api.radio-browser.info`);
+const OTHER_CITIES = /abuja|kano|port ?harcourt|\bph\b|ibadan|onitsha|enugu|benin|uyo|kaduna|ilorin|osogbo|akure|abeokuta|ekiti|jos|calabar|owerri|warri/i;
+
+let freq = 96.9, volume = 0.6, on = false, lookupDone = false;
+try {
+  const saved = JSON.parse(localStorage.getItem('starlite-live') || 'null');
+  if (saved) { freq = clamp(+saved.f || 96.9, MIN, MAX); volume = clamp(+saved.v, 0, 1); if (isNaN(volume)) volume = .6; }
+} catch (e) {}
+
+function clamp(x, a, b) { return Math.min(b, Math.max(a, x)); }
+const pct = f => ((f - MIN) / (MAX - MIN)) * 100;
+const $ = id => document.getElementById(id);
+
+/* ---------- Dial ---------- */
+const scale = $('scale'), calls = $('calls');
+for (let f = MIN; f <= MAX; f += 0.5) {
+  const t = document.createElement('div'), major = f % 2 === 0;
+  t.className = 'tick' + (major ? ' major' : ''); t.style.left = pct(f) + '%';
+  if (f % 1 !== 0) t.style.height = '5px';
+  scale.appendChild(t);
+  if (major) { const n = document.createElement('div'); n.className = 'num'; n.textContent = f; n.style.left = pct(f) + '%'; scale.appendChild(n); }
+}
+STATIONS.forEach(s => {
+  const dot = document.createElement('span');
+  dot.style.left = pct(s.f) + '%'; dot.title = `${s.name} ${s.f}`;
+  calls.appendChild(dot); s.dot = dot;
+});
+
+/* ---------- Finding streams ---------- */
+async function apiGet(path) {
+  for (const base of API) {
+    try {
+      const r = await fetch(base + path, { signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
+      if (r.ok) return await r.json();
+    } catch (e) {}
+  }
+  return [];
+}
+function score(st, s, term) {
+  const n = (st.name || '').toLowerCase(), state = (st.state || '').toLowerCase();
+  if (!n.includes(term.toLowerCase().split(' ')[0])) return -99;
+  let p = 0;
+  if (state.includes('lagos') || n.includes('lagos')) p += 4;
+  if (n.includes(String(s.f))) p += 4;
+  if (OTHER_CITIES.test(n) || OTHER_CITIES.test(state)) p -= 6;
+  if (st.lastcheckok === 1) p += 2;
+  p += Math.min(3, Math.log10((st.votes || 0) + 1));
+  return p;
+}
+async function findStreams() {
+  let cache = null;
+  try { cache = JSON.parse(localStorage.getItem('starlite-streams') || 'null'); } catch (e) {}
+  if (cache && Date.now() - cache.t < 7 * 864e5) {
+    STATIONS.forEach(s => s.urls = cache.urls[s.f] || []);
+  } else {
+    await Promise.all(STATIONS.map(async s => {
+      const found = [];
+      for (const term of s.q) {
+        const list = await apiGet(`/json/stations/search?name=${encodeURIComponent(term)}&countrycode=NG&hidebroken=true&limit=25`);
+        list.forEach(st => found.push({ st, p: score(st, s, term) }));
+      }
+      found.sort((a, b) => b.p - a.p);
+      const urls = [];
+      for (const { st, p } of found) {
+        if (p < 1) continue;
+        for (const u of [st.url_resolved, st.url]) {
+          if (!u || urls.includes(u)) continue;
+          if (location.protocol === 'https:' && u.startsWith('http:')) continue; // phones block http streams on https pages
+          urls.push(u);
+        }
+      }
+      s.urls = urls.slice(0, 4);
+    }));
+    try { localStorage.setItem('starlite-streams', JSON.stringify({ t: Date.now(), urls: Object.fromEntries(STATIONS.map(s => [s.f, s.urls])) })); } catch (e) {}
+  }
+  lookupDone = true;
+  update();
+}
+
+/* ---------- Sound: static (Web Audio) + live stream (<audio>) ---------- */
+let ctx, master, noiseGain, noiseBuf;
+const player = new Audio();
+player.preload = 'none';
+let current = null, status = '', applyTimer = 0, desired = null;
+
+function initAudio() {
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+  master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+  noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const ns = ctx.createBufferSource(); ns.buffer = noiseBuf; ns.loop = true;
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = .4;
+  noiseGain = ctx.createGain(); noiseGain.gain.value = .2;
+  ns.connect(bp).connect(noiseGain).connect(master); ns.start();
+  setInterval(() => {
+    if (!on || Math.random() > .05) return;
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), t = ctx.currentTime + .02;
+    s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = 1000;
+    g.gain.setValueAtTime(noiseGain.gain.value * 1.5, t); g.gain.exponentialRampToValueAtTime(.0001, t + .03);
+    s.connect(f).connect(g).connect(master); s.start(t, Math.random()); s.stop(t + .05);
+  }, 40);
+}
+
+function connect(s) {
+  if (s === current) return;
+  current = s;
+  if (!s) { player.pause(); player.removeAttribute('src'); player.load(); status = ''; update(); return; }
+  status = 'connecting';
+  player.src = s.urls[s.ui % s.urls.length];
+  player.play().catch(() => {});
+  setMediaSession(s);
+  update();
+}
+player.addEventListener('playing', () => { status = 'playing'; update(); });
+player.addEventListener('waiting', () => { if (current) { status = 'buffering'; update(); } });
+player.addEventListener('error', () => {
+  if (!current || !player.getAttribute('src')) return;
+  const s = current; s.ui++;
+  current = null;
+  if (s.ui < s.urls.length) connect(s);            // try the next link for this station
+  else { s.dead = true; status = 'unavailable'; current = s; update(); }
+});
+
+function setMediaSession(s) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({ title: s.name, artist: `${s.f} FM · Lagos`, album: 'Starlite Radio' });
+}
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('nexttrack', () => { stopScan(); seek(1); });
+  navigator.mediaSession.setActionHandler('previoustrack', () => { stopScan(); seek(-1); });
+  navigator.mediaSession.setActionHandler('pause', () => { if (on) powerBtn.click(); });
+  navigator.mediaSession.setActionHandler('play', () => { if (!on) powerBtn.click(); });
+}
+
+const strength = s => Math.max(0, 1 - Math.abs(freq - s.f) / WIDTH);
+const playable = s => s.urls.length && !s.dead;
+function bestStation() {
+  let best = null;
+  STATIONS.forEach(s => { const st = strength(s); if (!best || st > best.st) best = { s, st }; });
+  return best;
+}
+
+/* ---------- UI ---------- */
+const radio = $('radio'), needle = $('needle'), eye = $('eye');
+const tuneKnob = $('tuneKnob'), volKnob = $('volKnob');
+const powerBtn = $('power'), scanBtn = $('scan');
+
+function update() {
+  needle.style.left = pct(freq) + '%';
+  tuneKnob.style.transform = `rotate(${(freq - MIN) / (MAX - MIN) * 1080}deg)`;
+  tuneKnob.setAttribute('aria-valuenow', freq.toFixed(1));
+  tuneKnob.setAttribute('aria-valuetext', freq.toFixed(1) + ' FM');
+  volKnob.style.transform = `rotate(${-135 + volume * 270}deg)`;
+  volKnob.setAttribute('aria-valuenow', Math.round(volume * 100));
+  $('freq').textContent = freq.toFixed(1);
+
+  const { s: bs, st: best } = bestStation();
+  const live = current === bs && status === 'playing';
+  eye.style.setProperty('--gap', (4 + (1 - (live ? best : best * .4)) * 110) + 'deg');
+  STATIONS.forEach(s => {
+    s.dot.classList.toggle('near', s === bs && best > .5);
+    s.dot.style.opacity = lookupDone && !playable(s) ? '.2' : '';
+  });
+
+  let text;
+  if (!on) text = 'Off';
+  else if (!lookupDone) text = 'Finding Lagos stations…';
+  else if (best > .5) {
+    text = !bs.urls.length ? `${bs.name} isn't streaming online`
+      : bs.dead || (current === bs && status === 'unavailable') ? `${bs.name} stream is down right now`
+      : current === bs && status === 'playing' ? `${bs.name} · live`
+      : current === bs && status === 'buffering' ? `${bs.name} · buffering…`
+      : `${bs.name} · connecting…`;
+  } else text = scanning ? 'Scanning…' : 'Static';
+  $('station').textContent = text;
+
+  // Decide which stream should be playing, after the needle settles
+  const want = on && best > .5 && playable(bs) ? bs : null;
+  if (want !== desired) {
+    desired = want; clearTimeout(applyTimer);
+    applyTimer = setTimeout(() => connect(desired), want ? 350 : 1200);
+  }
+
+  player.volume = clamp(current ? volume * volume * Math.pow(strength(current), 1.2) : 0, 0, 1);
+  if (ctx) {
+    const now = ctx.currentTime;
+    const hiss = live ? (1 - best) * .2 + .004 : best > .5 && playable(bs) ? .05 : (1 - best * .5) * .2;
+    noiseGain.gain.setTargetAtTime(hiss, now, .05);
+    master.gain.setTargetAtTime(on ? volume * volume : 0, now, .05);
+  }
+  try { localStorage.setItem('starlite-live', JSON.stringify({ f: freq, v: volume })); } catch (e) {}
+}
+function setFreq(f) { freq = clamp(f, MIN, MAX); update(); }
+
+let sweepRaf = 0;
+function sweepTo(target, done) {
+  cancelAnimationFrame(sweepRaf);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setFreq(target); done && done(); return; }
+  const start = freq, t0 = performance.now(), dur = Math.max(200, Math.abs(target - start) * 130);
+  const step = now => {
+    const p = Math.min(1, (now - t0) / dur), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    setFreq(start + (target - start) * e);
+    if (p < 1) sweepRaf = requestAnimationFrame(step); else done && done();
+  };
+  sweepRaf = requestAnimationFrame(step);
+}
+
+/* Auto-tune: seek, scan, snap */
+function seekList() {
+  const list = STATIONS.filter(s => !lookupDone || playable(s));
+  return (list.length ? list : STATIONS).map(s => s.f).sort((a, b) => a - b);
+}
+function seek(dir, done) {
+  const F = seekList();
+  const target = dir > 0 ? (F.find(f => f > freq + .05) ?? F[0]) : ([...F].reverse().find(f => f < freq - .05) ?? F[F.length - 1]);
+  sweepTo(target, done);
+}
+let scanning = false, scanTimer = 0;
+function stopScan() {
+  if (!scanning) return;
+  scanning = false; clearTimeout(scanTimer);
+  scanBtn.setAttribute('aria-pressed', 'false'); scanBtn.textContent = 'Auto scan';
+  update();
+}
+function scanStep() { if (scanning) seek(1, () => { if (scanning) scanTimer = setTimeout(scanStep, 12000); }); }
+scanBtn.addEventListener('click', () => {
+  if (scanning) return stopScan();
+  if (!on) powerBtn.click();
+  scanning = true; scanBtn.setAttribute('aria-pressed', 'true'); scanBtn.textContent = 'Stop scan';
+  scanStep();
+});
+$('seekFwd').addEventListener('click', () => { stopScan(); seek(1); });
+$('seekBack').addEventListener('click', () => { stopScan(); seek(-1); });
+function snap() {
+  const near = STATIONS.reduce((a, s) => Math.abs(s.f - freq) < Math.abs(a.f - freq) ? s : a);
+  if (Math.abs(near.f - freq) < .3) sweepTo(near.f);
+}
+
+powerBtn.addEventListener('click', async () => {
+  on = !on;
+  powerBtn.setAttribute('aria-pressed', on);
+  radio.dataset.on = on;
+  if (on) {
+    if (!ctx) initAudio();
+    if (ctx.state === 'suspended') await ctx.resume();
+    STATIONS.forEach(s => { s.dead = false; s.ui = 0; });
+  } else { stopScan(); clearTimeout(applyTimer); desired = null; connect(null); }
+  update();
+});
+
+function knobDrag(el, onDelta, onEnd) {
+  let last = null;
+  const ang = e => { const r = el.getBoundingClientRect(); return Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2) * 180 / Math.PI; };
+  el.addEventListener('pointerdown', e => { el.setPointerCapture(e.pointerId); last = ang(e); cancelAnimationFrame(sweepRaf); });
+  el.addEventListener('pointermove', e => {
+    if (last === null) return;
+    const a = ang(e); let d = a - last;
+    if (d > 180) d -= 360; if (d < -180) d += 360;
+    last = a; onDelta(d);
+  });
+  const end = () => { if (last !== null && onEnd) onEnd(); last = null; };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+}
+knobDrag(tuneKnob, d => { stopScan(); setFreq(freq + d * (MAX - MIN) / 1080); }, snap);
+knobDrag(volKnob, d => { volume = clamp(volume + d / 270, 0, 1); update(); });
+tuneKnob.addEventListener('keydown', e => {
+  const step = e.shiftKey ? 1 : .1;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { stopScan(); setFreq(Math.round((freq + step) * 10) / 10); e.preventDefault(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { stopScan(); setFreq(Math.round((freq - step) * 10) / 10); e.preventDefault(); }
+});
+volKnob.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { volume = clamp(volume + .05, 0, 1); update(); e.preventDefault(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { volume = clamp(volume - .05, 0, 1); update(); e.preventDefault(); }
+});
+const dial = $('dial'), track = $('track');
+let dialDown = false;
+const fromX = x => { const r = track.getBoundingClientRect(); return MIN + clamp((x - r.left) / r.width, 0, 1) * (MAX - MIN); };
+dial.addEventListener('pointerdown', e => { dialDown = true; stopScan(); dial.setPointerCapture(e.pointerId); cancelAnimationFrame(sweepRaf); setFreq(fromX(e.clientX)); });
+dial.addEventListener('pointermove', e => { if (dialDown) setFreq(fromX(e.clientX)); });
+dial.addEventListener('pointerup', () => { if (dialDown) snap(); dialDown = false; });
+dial.addEventListener('pointercancel', () => dialDown = false);
+
+update();
+findStreams();
+</script>
+</body>
+</html>
