@@ -19,22 +19,21 @@
   padding-bottom:env(safe-area-inset-bottom,0px);
   --wall:#6E8E89; --wall-shade:#557570;
   --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
-  --dial-off:#B8AC8C; --ink:#2C1B0F; --needle:#B3281D;
-  --brass:#D2AA62; --brass-dark:#7A5A26; --cloth:#8C7858;
-  --eye:#5DF08C; --hint:#F4EEDF;
+  --ink:#2C1B0F; --brass:#D2AA62; --brass-dark:#7A5A26;
+  --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 }
 :root[data-theme="dark"]{ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 *,*::before,*::after{box-sizing:inherit}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+html{height:100%}
 body{
   margin:0;min-height:100%;
   background:radial-gradient(ellipse at 50% 30%, var(--wall), var(--wall-shade));
   font-family:"Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);
 }
-.room{min-height:100vh;display:grid;place-items:center;align-content:center;gap:18px;padding:24px 14px}
+.room{min-height:100vh;display:grid;justify-items:center;align-content:start;gap:18px;padding:24px 14px}
 .radio{
   width:min(100%,680px);padding:18px;border-radius:30px 30px 16px 16px;
   background:
@@ -42,35 +41,16 @@ body{
     linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));
   box-shadow:inset 0 2px 0 rgba(255,255,255,.18), inset 0 -6px 12px rgba(0,0,0,.35), 0 30px 60px rgba(0,0,0,.35);
 }
-.dial{padding:9px;border-radius:14px;background:linear-gradient(180deg,#EBCB86,var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
-.dial-face{
-  position:relative;height:112px;border-radius:8px;overflow:hidden;cursor:ew-resize;touch-action:none;
-  background:var(--dial-off);box-shadow:inset 0 3px 10px rgba(0,0,0,.35);transition:background .6s, box-shadow .6s;
+/* Now-playing panel */
+.frame{padding:9px;border-radius:14px;background:linear-gradient(180deg,#EBCB86,var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.face{
+  display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;
+  background:#B8AC8C;box-shadow:inset 0 3px 10px rgba(0,0,0,.35);transition:background .6s, box-shadow .6s;
 }
-.radio[data-on="true"] .dial-face{
+.radio[data-on="true"] .face{
   background:radial-gradient(ellipse at 50% 65%, #FFF0C2, #F3CD6E 55%, #D9A445);
   box-shadow:inset 0 3px 10px rgba(0,0,0,.25), inset 0 0 40px rgba(255,170,40,.55);
 }
-.track{position:absolute;inset:12px 24px}
-.calls span{position:absolute;top:6px;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--ink);opacity:.55}
-.calls span.near{background:var(--needle);opacity:1}
-.scale{position:absolute;left:0;right:0;top:30px;height:50px}
-.tick{position:absolute;top:0;width:1px;height:9px;background:var(--ink)}
-.tick.major{height:17px;width:2px;margin-left:-.5px}
-.num{position:absolute;top:22px;transform:translateX(-50%);font-size:17px;font-weight:600}
-.needle{position:absolute;top:-8px;bottom:-8px;width:3px;margin-left:-1.5px;background:var(--needle);border-radius:2px;box-shadow:0 0 5px rgba(179,40,29,.55)}
-.body{display:grid;grid-template-columns:1fr auto;gap:18px;margin-top:16px}
-.grille{
-  position:relative;min-height:190px;border-radius:12px;
-  background:
-    repeating-linear-gradient(45deg, rgba(0,0,0,.14) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(-45deg, rgba(255,255,255,.07) 0 1px, transparent 1px 4px),
-    linear-gradient(180deg,#9B8664,var(--cloth) 60%,#6E5C40);
-  box-shadow:inset 0 3px 10px rgba(0,0,0,.55);
-}
-.badge{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font-family:Limelight,Georgia,serif;font-size:28px;color:var(--brass);text-shadow:0 1px 0 rgba(0,0,0,.6),0 0 1px #000;white-space:nowrap}
-.controls{display:flex;flex-direction:column;align-items:center;gap:14px;width:210px}
-.top-row{display:flex;align-items:center;gap:12px;width:100%}
 .eye{
   --gap:120deg;flex:none;width:52px;height:52px;border-radius:50%;
   background:radial-gradient(circle,#2A2A22 0 20%,transparent 21%),#2F332C;
@@ -82,48 +62,23 @@ body{
     conic-gradient(#0E1C12 0 calc(var(--gap)/2), var(--eye) calc(var(--gap)/2) calc(360deg - var(--gap)/2), #0E1C12 calc(360deg - var(--gap)/2));
   box-shadow:0 0 0 4px var(--brass-dark),inset 0 0 8px #000,0 0 14px rgba(93,240,140,.45);
 }
-.readout{
-  display:block;flex:1;min-width:0;padding:7px 10px;border:none;border-radius:6px;text-align:left;cursor:pointer;
-  font-family:inherit;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);color:#E9C77A;
-}
-.freq{display:block;font-size:24px;font-weight:600;line-height:1}
-.freq small{font-size:14px;opacity:.7;margin-left:3px}
-.freq .edit{float:right;font-size:16px;opacity:.55}
-.station{display:block;font-size:15px;line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
-.sheet{
-  width:min(calc(100% - 32px),420px);max-height:calc(100% - 32px);padding:18px;border:none;border-radius:16px;
-  background:linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));color:#F3DC9B;
-  font-family:"Barlow Condensed","Arial Narrow",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.5);
-}
-.sheet::backdrop{background:rgba(20,12,6,.6)}
-.sheet h2{margin:0 0 12px;font:400 24px Limelight,Georgia,serif;color:var(--brass)}
-.sheet h3{margin:16px 0 6px;font-size:18px;font-weight:600}
-.sheet label{display:block;margin-bottom:10px;font-size:17px;font-weight:600}
-.sheet label em{font-style:normal;font-weight:500;opacity:.7}
-.sheet input{
-  display:block;width:100%;margin-top:4px;padding:9px 10px;border:none;border-radius:6px;
-  font:500 18px "Barlow Condensed","Arial Narrow",sans-serif;color:#F3DC9B;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
-}
-.sheet input::placeholder{color:rgba(243,220,155,.4)}
-.sheet-msg{min-height:1.2em;margin:0 0 8px;font-size:16px;color:#FFD08A}
-.sheet-btns{display:flex;gap:7px}
-.sheet-btns .key{margin-bottom:6px}
-.mine{list-style:none;margin:0;padding:0}
-.mine li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.12);font-size:17px}
-.mine li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mine button{border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;background:var(--walnut-dark);color:#E9C77A}
-.knobs{display:flex;gap:20px}
-.knob-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;color:#EED9A8;font-size:15px}
+.now{flex:1;min-width:0}
+.badge{font-family:Limelight,Georgia,serif;font-size:15px;color:var(--brass-dark);letter-spacing:.02em}
+.now-name{font-size:30px;font-weight:600;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now-line{font-size:17px;line-height:1.2;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Controls */
+.controls{display:flex;align-items:center;gap:14px;margin-top:16px}
+.knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;color:#EED9A8;font-size:14px}
 .knob{
-  position:relative;width:76px;height:76px;border-radius:50%;cursor:grab;touch-action:none;
+  position:relative;width:62px;height:62px;border-radius:50%;cursor:grab;touch-action:none;
   background:radial-gradient(circle at 35% 30%,#F3DCA4,var(--brass) 45%,var(--brass-dark));
   box-shadow:0 5px 9px rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.35);
 }
 .knob:active{cursor:grabbing}
 .knob::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.17) 0 3deg,transparent 3deg 9deg)}
-.knob .cap{position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#F8E7BC,#B88E46)}
-.knob .mark{position:absolute;left:50%;top:6px;width:4px;height:17px;margin-left:-2px;border-radius:2px;background:var(--walnut-dark)}
-.keys{display:flex;gap:7px;margin-top:18px}
+.knob .cap{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#F8E7BC,#B88E46)}
+.knob .mark{position:absolute;left:50%;top:5px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:var(--walnut-dark)}
+.keys{flex:1;display:flex;gap:7px;min-width:0}
 .key{
   flex:1;min-width:0;height:48px;border:none;border-radius:4px 4px 9px 9px;cursor:pointer;
   font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);
@@ -135,117 +90,171 @@ body{
 .key.power{flex:1.3;background:linear-gradient(#C9493D,#8F2B22);color:#FBEBD5;box-shadow:0 5px 0 #5A1A14,0 7px 9px rgba(0,0,0,.4)}
 .key.power[aria-pressed="true"]{box-shadow:0 1px 0 #5A1A14,0 2px 4px rgba(0,0,0,.4)}
 :focus-visible{outline:3px solid #FFE08A;outline-offset:3px}
-.hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
-.presets{display:flex;gap:7px;margin-top:14px}
-.preset{
-  flex:1;min-width:0;height:42px;padding:0 4px;border:none;border-radius:6px;cursor:pointer;
-  background:var(--walnut-dark);color:#E9C77A;font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;
-  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+/* Station grid */
+.tools{display:flex;gap:8px;margin-top:20px}
+.find{
+  flex:1;min-width:0;padding:10px 12px;border:none;border-radius:8px;
+  font:500 18px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--glow);
+  background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
+}
+.find::placeholder{color:rgba(243,220,155,.45)}
+.tools .key{flex:0 0 auto;padding:0 14px;height:44px}
+.group-title{margin:18px 2px 8px;font-size:18px;font-weight:600;color:#EED9A8;display:flex;justify-content:space-between;gap:8px}
+.group-title small{font-weight:500;opacity:.7;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.tile{position:relative}
+.tile .play{
+  display:block;width:100%;height:64px;padding:8px 30px 8px 10px;border:none;border-radius:8px;cursor:pointer;text-align:left;
+  font-family:inherit;color:var(--amber);background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
   -webkit-touch-callout:none;user-select:none;touch-action:manipulation;
 }
-.preset.bank{flex:0 0 auto;min-width:62px;color:var(--ink);background:linear-gradient(180deg,#F3DCA4,var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
-.preset.empty{color:rgba(233,199,122,.45)}
-.preset.active{box-shadow:inset 0 2px 5px rgba(0,0,0,.6),0 0 0 2px #E9C77A}
-.preset.holding{background:#5A3A1E}
+.tile .play b{display:block;font-size:21px;font-weight:600;line-height:1}
+.tile .play span{display:block;margin-top:4px;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.tile .star{
+  position:absolute;top:2px;right:2px;width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;
+  background:none;color:rgba(233,199,122,.5);font-size:20px;line-height:1;
+}
+.tile .star[aria-pressed="true"]{color:#FFD45C}
+.tile.current .play{background:radial-gradient(ellipse at 50% 65%, #FFF0C2, #F3CD6E 55%, #D9A445);color:var(--ink);box-shadow:inset 0 2px 5px rgba(0,0,0,.25),0 0 0 2px #FFE08A}
+.tile.current .star{color:rgba(44,27,15,.45)}
+.tile.current .star[aria-pressed="true"]{color:#8F2B22}
+.tile.down .play span::after{content:" · down";opacity:.8}
+.tile.down:not(.current) .play{opacity:.55}
+.tile.nostream .play{opacity:.6;height:56px}
+.tile.nostream .play span::after{content:" · add link"}
+.eq{position:absolute;right:12px;bottom:10px;display:none;gap:2px;align-items:flex-end;height:14px}
+.tile.live .eq{display:flex}
+.eq i{width:3px;background:var(--ink);border-radius:1px;animation:eq 1s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:-.4s}.eq i:nth-child(3){animation-delay:-.7s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+details.more{margin-top:18px}
+details.more summary{cursor:pointer;color:#EED9A8;font-size:18px;font-weight:600;padding:4px 2px}
+details.more .grid{margin-top:8px}
+.empty{grid-column:1/-1;margin:0;color:#EED9A8;opacity:.8;font-size:17px}
+.hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
 .toast{
   position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);
-  max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:#F3DC9B;
-  font-size:17px;box-shadow:0 8px 20px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:var(--glow);
+  font-size:17px;box-shadow:0 8px 20px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:5;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
-@media (max-width:560px){
-  .radio{padding:14px;border-radius:24px 24px 14px 14px}
-  .dial-face{height:100px}
-  .track{inset:10px 16px}
-  .calls span{width:5px;height:5px;margin-left:-2.5px}
-  .num{font-size:14px}
-  .body{grid-template-columns:1fr}
-  .grille{min-height:96px}
-  .badge{font-size:22px;bottom:50%;transform:translate(-50%,50%)}
-  .controls{width:auto}
-  .key{font-size:13px;height:44px}
-  .presets{gap:5px}
-  .preset{font-size:14px}
-  .preset.bank{min-width:54px}
+/* Add-a-station sheet */
+.sheet{
+  width:min(calc(100% - 32px),420px);max-height:calc(100% - 32px);padding:18px;border:none;border-radius:16px;
+  background:linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));color:var(--glow);
+  font-family:"Barlow Condensed","Arial Narrow",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.5);
 }
-@media (prefers-reduced-motion: reduce){ .dial-face,.eye,.key{transition:none} }
+.sheet::backdrop{background:rgba(20,12,6,.6)}
+.sheet h2{margin:0 0 12px;font:400 24px Limelight,Georgia,serif;color:var(--brass)}
+.sheet h3{margin:16px 0 6px;font-size:18px;font-weight:600}
+.sheet label{display:block;margin-bottom:10px;font-size:17px;font-weight:600}
+.sheet label em{font-style:normal;font-weight:500;opacity:.7}
+.sheet input{
+  display:block;width:100%;margin-top:4px;padding:9px 10px;border:none;border-radius:6px;
+  font:500 18px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--glow);background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
+}
+.sheet input::placeholder{color:rgba(243,220,155,.4)}
+.sheet-msg{min-height:1.2em;margin:0 0 8px;font-size:16px;color:#FFD08A}
+.sheet-btns{display:flex;gap:7px}
+.sheet-btns .key{margin-bottom:6px}
+.mine{list-style:none;margin:0;padding:0}
+.mine li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.12);font-size:17px}
+.mine li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mine button{border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;background:var(--walnut-dark);color:var(--amber)}
+@media (max-width:560px){
+  .room{padding:16px 12px}
+  .radio{padding:14px;border-radius:24px 24px 14px 14px}
+  .face{padding:10px 12px;gap:12px}
+  .eye{width:44px;height:44px}
+  .now-name{font-size:26px}
+  .controls{gap:10px}
+  .knob{width:54px;height:54px}
+  .knob .cap{inset:10px}
+  .keys{gap:5px}
+  .key{font-size:14px;height:44px}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .tile .play{height:60px;padding:7px 26px 7px 8px}
+  .tile .play b{font-size:19px}
+  .tile .play span{font-size:14px}
+  .tile .star{width:30px;height:30px;font-size:18px}
+}
+@media (prefers-reduced-motion: reduce){ .face,.eye,.key{transition:none} .eq i{animation:none;height:10px} }
 </style>
 </head>
 <body>
 <main class="room">
   <div class="radio" id="radio" data-on="false">
-    <div class="dial">
-      <div class="dial-face" id="dial" aria-hidden="true">
-        <div class="track" id="track">
-          <div class="calls" id="calls"></div>
-          <div class="scale" id="scale"></div>
-          <div class="needle" id="needle"></div>
+    <div class="frame">
+      <div class="face">
+        <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear"></div>
+        <div class="now" aria-live="polite">
+          <div class="badge">Starlite Lagos</div>
+          <div class="now-name" id="nowName">Pick a station</div>
+          <div class="now-line" id="nowLine">Off</div>
         </div>
       </div>
     </div>
-    <div class="body">
-      <div class="grille"><div class="badge">Starlite Lagos</div></div>
-      <div class="controls">
-        <div class="top-row">
-          <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear"></div>
-          <button class="readout" id="readout" aria-label="Type a frequency or add a station">
-            <span class="freq"><span id="freq">97.1</span><small>FM</small><span class="edit" aria-hidden="true">✎</span></span>
-            <span class="station" id="station" aria-live="polite">Off</span>
-          </button>
-        </div>
-        <div class="knobs">
-          <div class="knob-wrap">
-            <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100"><div class="cap"></div><div class="mark"></div></div>
-            Volume
-          </div>
-          <div class="knob-wrap">
-            <div class="knob" id="tuneKnob" role="slider" tabindex="0" aria-label="Tuning" aria-valuemin="88" aria-valuemax="108"><div class="cap"></div><div class="mark"></div></div>
-            Tuning
-          </div>
-        </div>
+    <div class="controls">
+      <div class="knob-wrap">
+        <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100"><div class="cap"></div><div class="mark"></div></div>
+        Volume
+      </div>
+      <div class="keys">
+        <button class="key" id="prev" aria-label="Previous station">◀</button>
+        <button class="key wide" id="scan" aria-pressed="false">Scan</button>
+        <button class="key" id="next" aria-label="Next station">▶</button>
+        <button class="key power" id="power" aria-pressed="false">On / off</button>
       </div>
     </div>
-    <div class="keys" id="keys">
-      <button class="key" id="seekBack" aria-label="Seek to previous station">◀ Seek</button>
-      <button class="key wide" id="scan" aria-pressed="false">Auto scan</button>
-      <button class="key" id="seekFwd" aria-label="Seek to next station">Seek ▶</button>
-      <button class="key power" id="power" aria-pressed="false">On / off</button>
+    <div class="tools">
+      <input class="find" id="find" type="search" placeholder="Find a station or frequency" autocomplete="off" aria-label="Find a station">
+      <button class="key" id="addBtn">+ Add</button>
     </div>
-    <div class="presets" id="presets" aria-label="Saved stations"></div>
+    <section id="favBox" hidden>
+      <h2 class="group-title">★ Favourites <small id="favCount"></small></h2>
+      <div class="grid" id="favGrid"></div>
+    </section>
+    <section>
+      <h2 class="group-title">All stations <small id="allCount"></small></h2>
+      <div class="grid" id="allGrid"></div>
+    </section>
+    <details class="more" id="moreBox">
+      <summary id="moreTitle">No online stream yet</summary>
+      <div class="grid" id="moreGrid"></div>
+    </details>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
     <form method="dialog" id="sheetForm" novalidate>
-      <h2 id="sheetTitle">Tune or add a station</h2>
+      <h2 id="sheetTitle">Add a station</h2>
       <label>Frequency (88.0 to 108.0)
         <input id="inFreq" inputmode="decimal" autocomplete="off" placeholder="e.g. 101.1" required>
       </label>
-      <label>Station name <em>for a new station; not needed to add a link to one already on the dial</em>
+      <label>Station name <em>for a new station</em>
         <input id="inName" maxlength="40" autocomplete="off" placeholder="e.g. Naija FM">
       </label>
-      <label>Stream link <em>optional; leave blank and Starlite will search for one</em>
+      <label>Stream link <em>optional for a new station; leave blank and Starlite will search for one</em>
         <input id="inUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">
       </label>
       <p class="sheet-msg" id="sheetMsg" role="alert"></p>
       <div class="sheet-btns">
         <button type="button" class="key" id="sheetCancel">Cancel</button>
-        <button type="submit" class="key" id="sheetTune" value="tune">Tune</button>
-        <button type="submit" class="key wide" id="sheetAdd" value="add">Add station</button>
+        <button type="submit" class="key wide" id="sheetAdd">Save</button>
       </div>
       <div id="mineBox" hidden>
-        <h3>Your stations</h3>
+        <h3>Your stations and links</h3>
         <ul class="mine" id="mine"></ul>
       </div>
     </form>
   </dialog>
-  <p class="hint">Tap an empty number button to save the station you're on, tap it again later to jump back, and press and hold to replace it. Tap Bank to switch between banks A to F for 30 saved stations. Seek and Auto scan find stations for you. Tap the frequency to type one in or add a station you know. Faded dots on the dial aren't streaming right now.</p>
+  <p class="hint">Tap a station to play it, and tap it again to switch off. Tap ☆ to keep it in Favourites at the top. ◀ and ▶ go to the previous or next station, and Scan plays each one for 12 seconds. Tap + Add to add a station you know or paste a stream link.</p>
 </main>
 
 <script>
-/* Starlite Lagos: live streaming radio.
-   Stream links below were checked by hand in October 2026. Stations without one (and any link that stops
-   working) are looked up in the free Radio Browser directory (radio-browser.info); found links are cached
-   on the phone for a week. You can also paste your own link for any station. */
+/* Starlite Lagos: live streaming radio, laid out as a grid of stations.
+   Stream links below were checked by hand in October 2026. Stations without one are looked up in the free
+   Radio Browser directory (radio-browser.info); found links are cached on the phone for a week.
+   You can also paste your own link for any station. */
 const ZENO = id => `https://stream.zeno.fm/${id}`;
 const ATUNWA = id => `https://${id}-atunwadigital.streamguys1.com/${id}`;
 const ELEKTRAN = 'https://azstream.elektranbroadcast.com';
@@ -312,60 +321,44 @@ const STATIONS = [
   { f: 107.7, name: 'Melody FM',      links: ['https://radio.sternhost.com:8370/radio.mp3'] },
 ];
 STATIONS.forEach(s => { s.links = s.links || []; s.q = [s.name, String(s.f)]; s.urls = []; s.ui = 0; s.url = ''; });
-const MIN = 88, MAX = 108, WIDTH = 0.18;
+const MIN = 88, MAX = 108;
 const API = ['de1', 'de2', 'fi1', 'nl1', 'at1'].map(h => `https://${h}.api.radio-browser.info`);
 const OTHER_CITIES = /abuja|kano|port ?harcourt|\bph\b|ibadan|onitsha|enugu|benin|uyo|kaduna|ilorin|osogbo|akure|abeokuta|ekiti|jos|calabar|owerri|warri/i;
-
-let freq = 96.9, volume = 0.6, on = false, lookupDone = false;
-try {
-  const saved = JSON.parse(localStorage.getItem('starlite-live') || 'null');
-  if (saved) { freq = clamp(+saved.f || 96.9, MIN, MAX); volume = clamp(+saved.v, 0, 1); if (isNaN(volume)) volume = .6; }
-} catch (e) {}
-
-function clamp(x, a, b) { return Math.min(b, Math.max(a, x)); }
-const pct = f => ((f - MIN) / (MAX - MIN)) * 100;
 const $ = id => document.getElementById(id);
+function clamp(x, a, b) { return Math.min(b, Math.max(a, x)); }
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
 
-/* ---------- Dial ---------- */
-const scale = $('scale'), calls = $('calls');
-for (let f = MIN; f <= MAX; f += 0.5) {
-  const t = document.createElement('div'), major = f % 2 === 0;
-  t.className = 'tick' + (major ? ' major' : ''); t.style.left = pct(f) + '%';
-  if (f % 1 !== 0) t.style.height = '5px';
-  scale.appendChild(t);
-  if (major) { const n = document.createElement('div'); n.className = 'num'; n.textContent = f; n.style.left = pct(f) + '%'; scale.appendChild(n); }
-}
-function addDot(s) {
-  const dot = document.createElement('span');
-  dot.style.left = pct(s.f) + '%'; dot.title = `${s.name} ${s.f}`;
-  calls.appendChild(dot); s.dot = dot;
-}
-
-/* Stations you add yourself: { f, name, url } saved on the phone */
+/* ---------- Your stations, your links, favourites ---------- */
 function customStation(c) {
   const s = { f: c.f, name: c.name, url: c.url || '', links: [], custom: true, q: [c.name, String(c.f)], urls: c.url ? [c.url] : [], ui: 0 };
   STATIONS.push(s);
   return s;
 }
-try {
-  const list = JSON.parse(localStorage.getItem('starlite-custom') || '[]');
-  if (Array.isArray(list)) list.forEach(c => {
-    const f = Math.round(+c.f * 10) / 10;
-    if (f >= MIN && f <= MAX && c.name && !STATIONS.some(s => Math.abs(s.f - f) < .05)) customStation({ f, name: String(c.name).slice(0, 40), url: c.url });
-  });
-} catch (e) {}
-/* Stream links you paste in for the built-in stations: { "89.7": "https://…" } */
-try {
-  const links = JSON.parse(localStorage.getItem('starlite-links') || '{}');
-  STATIONS.forEach(s => { if (!s.custom && typeof links[s.f] === 'string') s.url = links[s.f]; });
-} catch (e) {}
+(store.get('starlite-custom', []) || []).forEach(c => {
+  const f = Math.round(+c.f * 10) / 10;
+  if (f >= MIN && f <= MAX && c.name && !STATIONS.some(s => Math.abs(s.f - f) < .05)) customStation({ f, name: String(c.name).slice(0, 40), url: c.url });
+});
+const links = store.get('starlite-links', {});
+STATIONS.forEach(s => { if (!s.custom && typeof links[s.f] === 'string') s.url = links[s.f]; });
 function saveCustom() {
-  try {
-    localStorage.setItem('starlite-custom', JSON.stringify(STATIONS.filter(s => s.custom).map(s => ({ f: s.f, name: s.name, url: s.url }))));
-    localStorage.setItem('starlite-links', JSON.stringify(Object.fromEntries(STATIONS.filter(s => !s.custom && s.url).map(s => [s.f, s.url]))));
-  } catch (e) {}
+  store.set('starlite-custom', STATIONS.filter(s => s.custom).map(s => ({ f: s.f, name: s.name, url: s.url })));
+  store.set('starlite-links', Object.fromEntries(STATIONS.filter(s => !s.custom && s.url).map(s => [s.f, s.url])));
 }
-STATIONS.forEach(addDot);
+const byF = f => STATIONS.find(s => Math.abs(s.f - f) < .05);
+// Favourites start out as whatever you had saved on the old preset buttons
+let favs = store.get('starlite-favs', null);
+if (!Array.isArray(favs)) favs = [...new Set((store.get('starlite-presets-v2', []) || []).filter(f => typeof f === 'number'))];
+const isFav = s => favs.some(f => Math.abs(f - s.f) < .05);
+function toggleFav(s) {
+  favs = isFav(s) ? favs.filter(f => Math.abs(f - s.f) >= .05) : [...favs, s.f];
+  store.set('starlite-favs', favs);
+  if (navigator.vibrate) navigator.vibrate(20);
+  toast(isFav(s) ? `${s.name} added to Favourites` : `${s.name} removed from Favourites`);
+  render();
+}
 
 /* ---------- Finding streams ---------- */
 async function apiGet(path) {
@@ -390,6 +383,7 @@ function score(st, s, term) {
   p += Math.min(3, Math.log10((st.votes || 0) + 1));
   return p;
 }
+const DEAD = ['lunar.citrus3.com:8124', 'edge.mixlr.com/channel/twrez'];   // listed in the directory but checked dead (Konga, Rainbow)
 const known = s => s.url ? [s.url, ...s.links.filter(u => u !== s.url)] : s.links;   // your own link goes first
 async function lookup(s) {
   if (s.url || s.links.length) { s.urls = known(s); s.ui = 0; s.dead = false; return; }
@@ -405,6 +399,7 @@ async function lookup(s) {
     for (const u of [st.url_resolved, st.url]) {
       if (!u || urls.includes(u)) continue;
       if (location.protocol === 'https:' && u.startsWith('http:')) continue; // phones block http streams on https pages
+      if (DEAD.some(d => u.includes(d))) continue;
       urls.push(u);
     }
   }
@@ -412,396 +407,270 @@ async function lookup(s) {
 }
 let streamCache = { t: 0, urls: {} };
 function saveStreamCache() {
-  streamCache.urls = Object.fromEntries(STATIONS.map(s => [s.f, s.urls]));
-  try { localStorage.setItem('starlite-streams-v3', JSON.stringify(streamCache)); } catch (e) {}
+  streamCache.urls = Object.fromEntries(STATIONS.filter(s => !s.links.length && !s.url).map(s => [s.f, s.urls]));
+  store.set('starlite-streams-v4', streamCache);
 }
 async function findStreams() {
-  try { streamCache = JSON.parse(localStorage.getItem('starlite-streams-v3') || 'null') || streamCache; } catch (e) {}
+  streamCache = store.get('starlite-streams-v4', streamCache);
   const fresh = Date.now() - streamCache.t < 7 * 864e5;
   if (!fresh) streamCache.t = Date.now();
-  await Promise.all(STATIONS.map(async s => {
+  STATIONS.forEach(s => { if (s.url || s.links.length) s.urls = known(s); });   // these are ready straight away
+  render();
+  await Promise.all(STATIONS.filter(s => !s.urls.length).map(async s => {
     const cached = fresh && streamCache.urls[s.f];
-    if (s.url || s.links.length) s.urls = known(s);
-    else if (cached) s.urls = cached;
-    else await lookup(s);
+    if (cached) s.urls = cached; else await lookup(s);
   }));
   saveStreamCache();
-  lookupDone = true;
-  update();
+  render();
 }
 
-/* ---------- Sound: static (Web Audio) + live stream (<audio>) ---------- */
-let ctx, master, noiseGain, noiseBuf;
+/* ---------- Playing ---------- */
 const player = new Audio();
 player.preload = 'none';
-let current = null, status = '', applyTimer = 0, desired = null;
-
-function initAudio() {
-  ctx = new (window.AudioContext || window.webkitAudioContext)();
-  master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-  noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-  const d = noiseBuf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  const ns = ctx.createBufferSource(); ns.buffer = noiseBuf; ns.loop = true;
-  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = .4;
-  noiseGain = ctx.createGain(); noiseGain.gain.value = .2;
-  ns.connect(bp).connect(noiseGain).connect(master); ns.start();
-  setInterval(() => {
-    if (!on || Math.random() > .05) return;
-    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), t = ctx.currentTime + .02;
-    s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = 1000;
-    g.gain.setValueAtTime(noiseGain.gain.value * 1.5, t); g.gain.exponentialRampToValueAtTime(.0001, t + .03);
-    s.connect(f).connect(g).connect(master); s.start(t, Math.random()); s.stop(t + .05);
-  }, 40);
+let on = false, sel = null, current = null, status = '', volume = .6;
+{
+  const saved = store.get('starlite-live', null);
+  if (saved) { volume = clamp(+saved.v, 0, 1); if (isNaN(volume)) volume = .6; sel = byF(+saved.f) || null; }
 }
+function saveLive() { store.set('starlite-live', { f: sel ? sel.f : null, v: volume }); }
+const playable = s => s.urls.length > 0;
 
 function connect(s) {
-  if (s === current) return;
   current = s;
   if (!s) { player.pause(); player.removeAttribute('src'); player.load(); status = ''; update(); return; }
   status = 'connecting';
   player.src = s.urls[s.ui % s.urls.length];
+  player.volume = volume * volume;
   player.play().catch(() => {});
   setMediaSession(s);
   update();
 }
-player.addEventListener('playing', () => { status = 'playing'; update(); });
+player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); } });
 player.addEventListener('waiting', () => { if (current) { status = 'buffering'; update(); } });
 player.addEventListener('error', () => {
   if (!current || !player.getAttribute('src')) return;
   const s = current; s.ui++;
-  current = null;
   if (s.ui < s.urls.length) connect(s);            // try the next link for this station
-  else { s.dead = true; status = 'unavailable'; current = s; update(); }
+  else { s.dead = true; status = 'unavailable'; update(); }
 });
+
+function play(s) {
+  if (!s) return;
+  if (!playable(s)) return openSheet(s);
+  sel = s; on = true; s.dead = false; s.ui = 0;
+  connect(s); saveLive();
+}
+function off() { on = false; stopScan(); connect(null); }
+function step(dir) {
+  const list = STATIONS.filter(playable).sort((a, b) => a.f - b.f);
+  if (!list.length) return;
+  const i = list.indexOf(sel);
+  if (i >= 0) return play(list[(i + dir + list.length) % list.length]);
+  const after = sel && list.find(s => s.f > sel.f), before = sel && [...list].reverse().find(s => s.f < sel.f);
+  play(dir > 0 ? after || list[0] : before || list[list.length - 1]);
+}
 
 function setMediaSession(s) {
   if (!('mediaSession' in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({ title: s.name, artist: `${s.f} FM · Lagos`, album: 'Starlite Radio' });
+  navigator.mediaSession.metadata = new MediaMetadata({ title: s.name, artist: `${s.f.toFixed(1)} FM · Lagos`, album: 'Starlite Radio' });
 }
 if ('mediaSession' in navigator) {
-  navigator.mediaSession.setActionHandler('nexttrack', () => { stopScan(); seek(1); });
-  navigator.mediaSession.setActionHandler('previoustrack', () => { stopScan(); seek(-1); });
-  navigator.mediaSession.setActionHandler('pause', () => { if (on) powerBtn.click(); });
-  navigator.mediaSession.setActionHandler('play', () => { if (!on) powerBtn.click(); });
+  navigator.mediaSession.setActionHandler('nexttrack', () => { stopScan(); step(1); });
+  navigator.mediaSession.setActionHandler('previoustrack', () => { stopScan(); step(-1); });
+  navigator.mediaSession.setActionHandler('pause', () => { if (on) off(); });
+  navigator.mediaSession.setActionHandler('play', () => { if (!on) play(sel || STATIONS.find(playable)); });
 }
 
-const strength = s => Math.max(0, 1 - Math.abs(freq - s.f) / WIDTH);
-const playable = s => s.urls.length && !s.dead;
-function bestStation() {
-  let best = null;
-  STATIONS.forEach(s => { const st = strength(s); if (!best || st > best.st) best = { s, st }; });
-  return best;
-}
-
-/* ---------- UI ---------- */
-const radio = $('radio'), needle = $('needle'), eye = $('eye');
-const tuneKnob = $('tuneKnob'), volKnob = $('volKnob');
-const powerBtn = $('power'), scanBtn = $('scan');
-
+/* ---------- Now-playing panel ---------- */
+const radio = $('radio'), eye = $('eye'), powerBtn = $('power'), scanBtn = $('scan'), volKnob = $('volKnob');
 function update() {
-  needle.style.left = pct(freq) + '%';
-  tuneKnob.style.transform = `rotate(${(freq - MIN) / (MAX - MIN) * 1080}deg)`;
-  tuneKnob.setAttribute('aria-valuenow', freq.toFixed(1));
-  tuneKnob.setAttribute('aria-valuetext', freq.toFixed(1) + ' FM');
+  radio.dataset.on = on;
+  powerBtn.setAttribute('aria-pressed', on);
+  $('nowName').textContent = sel ? sel.name : 'Pick a station';
+  const fm = sel ? `${sel.f.toFixed(1)} FM` : '';
+  $('nowLine').textContent = !on ? (sel ? `${fm} · off` : 'Off')
+    : status === 'playing' ? `${fm} · live`
+    : status === 'buffering' ? `${fm} · buffering…`
+    : status === 'unavailable' ? `${fm} · stream is down right now`
+    : `${fm} · connecting…`;
+  eye.style.setProperty('--gap', (status === 'playing' ? 6 : status === 'unavailable' ? 120 : 70) + 'deg');
   volKnob.style.transform = `rotate(${-135 + volume * 270}deg)`;
   volKnob.setAttribute('aria-valuenow', Math.round(volume * 100));
-  $('freq').textContent = freq.toFixed(1);
-
-  const { s: bs, st: best } = bestStation();
-  const live = current === bs && status === 'playing';
-  eye.style.setProperty('--gap', (4 + (1 - (live ? best : best * .4)) * 110) + 'deg');
-  STATIONS.forEach(s => {
-    s.dot.classList.toggle('near', s === bs && best > .5);
-    s.dot.style.opacity = lookupDone && !playable(s) ? '.2' : '';
-  });
-
-  let text;
-  if (!on) text = 'Off';
-  else if (!lookupDone) text = 'Finding Lagos stations…';
-  else if (best > .5) {
-    text = !bs.urls.length ? `${bs.name} · no online stream yet`
-      : bs.dead || (current === bs && status === 'unavailable') ? `${bs.name} stream is down right now`
-      : current === bs && status === 'playing' ? `${bs.name} · live`
-      : current === bs && status === 'buffering' ? `${bs.name} · buffering…`
-      : `${bs.name} · connecting…`;
-  } else text = scanning ? 'Scanning…' : 'Static';
-  $('station').textContent = text;
-
-  // Decide which stream should be playing, after the needle settles
-  const want = on && best > .5 && playable(bs) ? bs : null;
-  if (want !== desired) {
-    desired = want; clearTimeout(applyTimer);
-    applyTimer = setTimeout(() => connect(desired), want ? 350 : 1200);
-  }
-
-  player.volume = clamp(current ? volume * volume * Math.pow(strength(current), 1.2) : 0, 0, 1);
-  if (ctx) {
-    const now = ctx.currentTime;
-    const hiss = live ? (1 - best) * .2 + .004 : best > .5 && playable(bs) ? .05 : (1 - best * .5) * .2;
-    noiseGain.gain.setTargetAtTime(hiss, now, .05);
-    master.gain.setTargetAtTime(on ? volume * volume : 0, now, .05);
-  }
-  markPresets();
-  try { localStorage.setItem('starlite-live', JSON.stringify({ f: freq, v: volume })); } catch (e) {}
+  player.volume = volume * volume;
+  markTiles();
 }
-function setFreq(f) { freq = clamp(f, MIN, MAX); update(); }
 
-let sweepRaf = 0;
-function sweepTo(target, done) {
-  cancelAnimationFrame(sweepRaf);
-  // No animation frames run while the screen is off or the app is in the background, so jump straight there
-  if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) { setFreq(target); done && done(); return; }
-  const start = freq, t0 = performance.now(), dur = Math.max(200, Math.abs(target - start) * 130);
-  const step = now => {
-    const p = Math.min(1, (now - t0) / dur), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-    setFreq(start + (target - start) * e);
-    if (p < 1) sweepRaf = requestAnimationFrame(step); else done && done();
+/* ---------- Station grid ---------- */
+const tiles = new Map();   // station -> [tile elements]
+function tile(s) {
+  const t = document.createElement('div'), b = document.createElement('button'), star = document.createElement('button');
+  t.className = 'tile'; b.className = 'play'; star.className = 'star';
+  const fq = document.createElement('b'), nm = document.createElement('span'), eq = document.createElement('div');
+  fq.textContent = s.f.toFixed(1); nm.textContent = s.name;
+  eq.className = 'eq'; eq.innerHTML = '<i></i><i></i><i></i>';
+  b.append(fq, nm, eq);
+  b.addEventListener('click', () => { stopScan(); if (on && sel === s) off(); else play(s); });
+  b.addEventListener('contextmenu', e => { e.preventDefault(); toggleFav(s); });   // long-press on phones
+  star.addEventListener('click', () => toggleFav(s));
+  if (playable(s)) t.append(b, star); else { t.classList.add('nostream'); t.append(b); }
+  if (!tiles.has(s)) tiles.set(s, []);
+  tiles.get(s).push(t);
+  return t;
+}
+function render() {
+  tiles.clear();
+  const q = $('find').value.trim().toLowerCase();
+  const match = s => !q || s.name.toLowerCase().includes(q) || s.f.toFixed(1).includes(q);
+  const sorted = [...STATIONS].sort((a, b) => a.f - b.f);
+  const live = sorted.filter(playable), none = sorted.filter(s => !playable(s));
+  const favList = live.filter(isFav);
+  const fill = (el, list, emptyText) => {
+    el.textContent = '';
+    list.filter(match).forEach(s => el.appendChild(tile(s)));
+    if (!el.children.length && emptyText) { const p = document.createElement('p'); p.className = 'empty'; p.textContent = emptyText; el.appendChild(p); }
   };
-  sweepRaf = requestAnimationFrame(step);
+  $('favBox').hidden = !favList.length || (q && !favList.some(match));
+  fill($('favGrid'), favList);
+  $('favCount').textContent = favList.length;
+  fill($('allGrid'), live, q ? `No streaming station matches “${$('find').value.trim()}”` : 'Finding stations…');
+  $('allCount').textContent = `${live.length} streaming`;
+  fill($('moreGrid'), none);
+  $('moreBox').hidden = !none.filter(match).length;
+  $('moreTitle').textContent = `No online stream yet (${none.length}) · tap one to add its link`;
+  if (q && none.some(match)) $('moreBox').open = true;
+  markTiles();
 }
+function markTiles() {
+  tiles.forEach((els, s) => els.forEach(t => {
+    const isCur = sel === s && on;
+    t.classList.toggle('current', isCur);
+    t.classList.toggle('live', isCur && status === 'playing');
+    t.classList.toggle('down', !!s.dead);
+    const b = t.querySelector('.play'), star = t.querySelector('.star');
+    b.setAttribute('aria-pressed', isCur);
+    b.setAttribute('aria-label', playable(s) ? `${s.name} ${s.f.toFixed(1)} FM${isCur ? ', playing. Tap to switch off' : ''}` : `${s.name} ${s.f.toFixed(1)} FM, no online stream yet. Tap to add its link`);
+    if (star) { star.textContent = isFav(s) ? '★' : '☆'; star.setAttribute('aria-pressed', isFav(s)); star.setAttribute('aria-label', `${isFav(s) ? 'Remove' : 'Add'} ${s.name} ${isFav(s) ? 'from' : 'to'} Favourites`); }
+  }));
+}
+$('find').addEventListener('input', render);
 
-/* Auto-tune: seek, scan, snap */
-function seekList() {
-  const list = STATIONS.filter(s => !lookupDone || playable(s));
-  return (list.length ? list : STATIONS).map(s => s.f).sort((a, b) => a - b);
-}
-function seek(dir, done) {
-  const F = seekList();
-  const target = dir > 0 ? (F.find(f => f > freq + .05) ?? F[0]) : ([...F].reverse().find(f => f < freq - .05) ?? F[F.length - 1]);
-  sweepTo(target, done);
-}
+/* ---------- Buttons and volume ---------- */
 let scanning = false, scanTimer = 0;
 function stopScan() {
   if (!scanning) return;
   scanning = false; clearTimeout(scanTimer);
-  scanBtn.setAttribute('aria-pressed', 'false'); scanBtn.textContent = 'Auto scan';
-  update();
+  scanBtn.setAttribute('aria-pressed', 'false'); scanBtn.textContent = 'Scan';
 }
-function scanStep() { if (scanning) seek(1, () => { if (scanning) scanTimer = setTimeout(scanStep, 12000); }); }
+function scanStep() { if (!scanning) return; step(1); scanTimer = setTimeout(scanStep, 12000); }
 scanBtn.addEventListener('click', () => {
   if (scanning) return stopScan();
-  if (!on) powerBtn.click();
   scanning = true; scanBtn.setAttribute('aria-pressed', 'true'); scanBtn.textContent = 'Stop scan';
   scanStep();
 });
-$('seekFwd').addEventListener('click', () => { stopScan(); seek(1); });
-$('seekBack').addEventListener('click', () => { stopScan(); seek(-1); });
-function snap() {
-  const near = STATIONS.reduce((a, s) => Math.abs(s.f - freq) < Math.abs(a.f - freq) ? s : a);
-  if (Math.abs(near.f - freq) < .3) sweepTo(near.f);
-}
+$('next').addEventListener('click', () => { stopScan(); step(1); });
+$('prev').addEventListener('click', () => { stopScan(); step(-1); });
+powerBtn.addEventListener('click', () => { stopScan(); if (on) off(); else play(sel && playable(sel) ? sel : STATIONS.filter(playable).sort((a, b) => a.f - b.f)[0]); });
 
-powerBtn.addEventListener('click', async () => {
-  on = !on;
-  powerBtn.setAttribute('aria-pressed', on);
-  radio.dataset.on = on;
-  if (on) {
-    if (!ctx) initAudio();
-    if (ctx.state === 'suspended') await ctx.resume();
-    STATIONS.forEach(s => { s.dead = false; s.ui = 0; });
-  } else { stopScan(); clearTimeout(applyTimer); desired = null; connect(null); }
-  update();
-});
-
-function knobDrag(el, onDelta, onEnd) {
+function knobDrag(el, onDelta) {
   let last = null;
   const ang = e => { const r = el.getBoundingClientRect(); return Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2) * 180 / Math.PI; };
-  el.addEventListener('pointerdown', e => { el.setPointerCapture(e.pointerId); last = ang(e); cancelAnimationFrame(sweepRaf); });
+  el.addEventListener('pointerdown', e => { el.setPointerCapture(e.pointerId); last = ang(e); });
   el.addEventListener('pointermove', e => {
     if (last === null) return;
     const a = ang(e); let d = a - last;
     if (d > 180) d -= 360; if (d < -180) d += 360;
     last = a; onDelta(d);
   });
-  const end = () => { if (last !== null && onEnd) onEnd(); last = null; };
+  const end = () => { last = null; saveLive(); };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
-knobDrag(tuneKnob, d => { stopScan(); setFreq(freq + d * (MAX - MIN) / 1080); }, snap);
 knobDrag(volKnob, d => { volume = clamp(volume + d / 270, 0, 1); update(); });
-tuneKnob.addEventListener('keydown', e => {
-  const step = e.shiftKey ? 1 : .1;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { stopScan(); setFreq(Math.round((freq + step) * 10) / 10); e.preventDefault(); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { stopScan(); setFreq(Math.round((freq - step) * 10) / 10); e.preventDefault(); }
-});
 volKnob.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { volume = clamp(volume + .05, 0, 1); update(); e.preventDefault(); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { volume = clamp(volume - .05, 0, 1); update(); e.preventDefault(); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { volume = clamp(volume + .05, 0, 1); update(); saveLive(); e.preventDefault(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { volume = clamp(volume - .05, 0, 1); update(); saveLive(); e.preventDefault(); }
 });
-const dial = $('dial'), track = $('track');
-let dialDown = false;
-const fromX = x => { const r = track.getBoundingClientRect(); return MIN + clamp((x - r.left) / r.width, 0, 1) * (MAX - MIN); };
-dial.addEventListener('pointerdown', e => { dialDown = true; stopScan(); dial.setPointerCapture(e.pointerId); cancelAnimationFrame(sweepRaf); setFreq(fromX(e.clientX)); });
-dial.addEventListener('pointermove', e => { if (dialDown) setFreq(fromX(e.clientX)); });
-dial.addEventListener('pointerup', () => { if (dialDown) snap(); dialDown = false; });
-dial.addEventListener('pointercancel', () => dialDown = false);
 
-/* ---------- Presets: 6 banks (A–F) × 5 buttons ---------- */
-const PER_BANK = 5, BANKS = 'ABCDEF';
-let presets = Array(PER_BANK * BANKS.length).fill(null), bank = 0;
-try {
-  const p = JSON.parse(localStorage.getItem('starlite-presets-v2') || 'null')
-         || JSON.parse(localStorage.getItem('starlite-presets') || 'null');   // old 5 presets move into bank A
-  if (Array.isArray(p)) presets = presets.map((_, i) => typeof p[i] === 'number' ? p[i] : null);
-  bank = clamp(parseInt(localStorage.getItem('starlite-bank') || '0', 10) || 0, 0, BANKS.length - 1);
-} catch (e) {}
-const presetBox = $('presets'), toastEl = $('toast');
-const stationAt = f => STATIONS.find(s => Math.abs(s.f - f) < .01);
-const slot = i => bank * PER_BANK + i;
+const toastEl = $('toast');
 let toastTimer = 0;
 function toast(msg) {
   toastEl.textContent = msg; toastEl.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
-}
-function savePresets() {
-  try { localStorage.setItem('starlite-presets-v2', JSON.stringify(presets)); localStorage.setItem('starlite-bank', bank); } catch (e) {}
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
 }
 
-const bankBtn = document.createElement('button');
-bankBtn.className = 'preset bank';
-bankBtn.addEventListener('click', () => {
-  bank = (bank + 1) % BANKS.length;
-  savePresets(); renderPresets();
-  const used = presets.slice(bank * PER_BANK, bank * PER_BANK + PER_BANK).filter(f => f !== null).length;
-  toast(`Bank ${BANKS[bank]} · ${used ? used + ' saved' : 'empty'}`);
-});
-presetBox.appendChild(bankBtn);
-
-const presetBtns = Array.from({ length: PER_BANK }, (_, i) => {
-  const b = document.createElement('button');
-  b.className = 'preset';
-  let holdTimer = 0, held = false;
-  const clearHold = () => { clearTimeout(holdTimer); b.classList.remove('holding'); };
-  const replace = () => {
-    if (held || presets[slot(i)] === null) return;
-    held = true; clearHold(); saveTo(i, true);
-  };
-  b.addEventListener('pointerdown', () => {
-    held = false;
-    if (presets[slot(i)] === null) return;
-    b.classList.add('holding');
-    holdTimer = setTimeout(replace, 650);
-  });
-  b.addEventListener('pointerup', clearHold);
-  b.addEventListener('pointerleave', clearHold);
-  b.addEventListener('pointercancel', clearHold);
-  // Android cancels the touch on a long press and fires contextmenu instead, so treat that as the hold too
-  b.addEventListener('contextmenu', e => { e.preventDefault(); replace(); });
-  b.addEventListener('click', () => {
-    if (held) { held = false; return; }
-    if (presets[slot(i)] === null) return saveTo(i, false);
-    stopScan();
-    if (!on) powerBtn.click();
-    sweepTo(presets[slot(i)]);
-  });
-  presetBox.appendChild(b);
-  return b;
-});
-
-function saveTo(i, replacing) {
-  const { s, st } = bestStation();
-  const name = `${BANKS[bank]}${i + 1}`;
-  if (st < .5) return toast('Tune to a station first, then tap to save it');
-  if (presets[slot(i)] === s.f) return toast(`${s.name} is already on ${name}`);
-  presets[slot(i)] = s.f; savePresets(); renderPresets();
-  if (navigator.vibrate) navigator.vibrate(30);
-  toast(`${replacing ? 'Replaced with' : 'Saved'} ${s.name} on ${name}`);
-}
-function renderPresets() {
-  bankBtn.textContent = `Bank ${BANKS[bank]}`;
-  bankBtn.setAttribute('aria-label', `Preset bank ${BANKS[bank]}, ${bank + 1} of ${BANKS.length}. Tap for the next bank.`);
-  presetBtns.forEach((b, i) => {
-    const f = presets[slot(i)], s = f !== null && stationAt(f);
-    b.textContent = s ? `${i + 1} ${s.name}` : `${i + 1} +`;
-    b.classList.toggle('empty', !s);
-    b.setAttribute('aria-label', s ? `${BANKS[bank]}${i + 1}: ${s.name} ${s.f}. Tap to tune, hold to replace.` : `${BANKS[bank]}${i + 1}: empty. Tap to save the current station.`);
-  });
-  markPresets();
-}
-function markPresets() {
-  if (typeof presetBtns === 'undefined') return;
-  presetBtns.forEach((b, i) => b.classList.toggle('active', presets[slot(i)] !== null && Math.abs(freq - presets[slot(i)]) < .05));
-}
-
-/* ---------- Type a frequency, or add stations you know ---------- */
+/* ---------- Add a station, or paste a link for one ---------- */
 const sheet = $('sheet'), inFreq = $('inFreq'), inName = $('inName'), inUrl = $('inUrl'), sheetMsg = $('sheetMsg');
-let sheetAction = 'tune';
 function parseFreq(v) {
   const f = Math.round(parseFloat(String(v).replace(',', '.')) * 10) / 10;
   return f >= MIN && f <= MAX ? f : null;
 }
-function goTo(f) { stopScan(); if (!on) powerBtn.click(); sweepTo(f); }
 function renderMine() {
   const mine = STATIONS.filter(s => s.custom || s.url).sort((a, b) => a.f - b.f), ul = $('mine');
   $('mineBox').hidden = !mine.length;
   ul.textContent = '';
   mine.forEach(s => {
     const li = document.createElement('li'), label = document.createElement('span'), del = document.createElement('button');
-    label.textContent = `${s.f.toFixed(1)} ${s.name}${!s.custom ? ' · your link' : lookupDone && !s.urls.length ? ' · no stream yet' : ''}`;
+    label.textContent = `${s.f.toFixed(1)} ${s.name}${!s.custom ? ' · your link' : !s.urls.length ? ' · no stream yet' : ''}`;
     del.type = 'button'; del.textContent = 'Remove'; del.setAttribute('aria-label', s.custom ? `Remove ${s.name}` : `Remove your link for ${s.name}`);
     del.addEventListener('click', () => removeStation(s));
     li.append(label, del); ul.appendChild(li);
   });
 }
 function removeStation(s) {
-  if (!s.custom) {   // built-in station: just drop your link and search again
-    if (current === s) { connect(null); desired = null; }
-    s.url = ''; saveCustom(); renderMine(); findStreamFor(s, false);
+  if (current === s) off();
+  if (!s.custom) {   // built-in station: just drop your link
+    s.url = ''; saveCustom(); renderMine();
+    lookup(s).then(() => { saveStreamCache(); render(); });
     return toast(`Removed your link for ${s.name}`);
   }
-  STATIONS.splice(STATIONS.indexOf(s), 1); s.dot.remove();
-  if (current === s) { connect(null); desired = null; }
-  presets = presets.map(f => f !== null && Math.abs(f - s.f) < .01 ? null : f);
-  saveCustom(); savePresets(); saveStreamCache(); renderPresets(); renderMine(); update();
+  STATIONS.splice(STATIONS.indexOf(s), 1);
+  if (sel === s) sel = null;
+  favs = favs.filter(f => Math.abs(f - s.f) >= .05); store.set('starlite-favs', favs);
+  saveCustom(); saveStreamCache(); renderMine(); render(); update();
   toast(`Removed ${s.name}`);
 }
-function findStreamFor(s, hadLink) {
-  lookup(s).then(() => {
-    saveStreamCache(); update();
-    if (!hadLink) toast(s.urls.length ? `Found a stream for ${s.name}` : `No stream found for ${s.name}. Tap the frequency to add its link.`);
-  });
-}
-$('readout').addEventListener('click', () => {
-  inFreq.value = freq.toFixed(1); inName.value = ''; inUrl.value = ''; sheetMsg.textContent = '';
+function openSheet(s) {
+  inFreq.value = s ? s.f.toFixed(1) : ''; inName.value = s ? s.name : ''; inUrl.value = '';
+  $('sheetTitle').textContent = s ? `Add a link for ${s.name}` : 'Add a station';
+  sheetMsg.textContent = s ? `Paste the stream link for ${s.name} ${s.f.toFixed(1)} and tap Save.` : '';
   renderMine();
-  sheet.showModal(); inFreq.select();
-});
+  sheet.showModal();
+  (s ? inUrl : inFreq).focus();
+}
+$('addBtn').addEventListener('click', () => openSheet(null));
 $('sheetCancel').addEventListener('click', () => sheet.close());
-$('sheetTune').addEventListener('click', () => sheetAction = 'tune');
-$('sheetAdd').addEventListener('click', () => sheetAction = 'add');
 $('sheetForm').addEventListener('submit', e => {
   e.preventDefault();
-  const action = sheetAction; sheetAction = 'tune';   // Enter key in a field means Tune
   const f = parseFreq(inFreq.value), say = (msg, el) => { sheetMsg.textContent = msg; el.focus(); };
   if (f === null) return say('Type a frequency between 88.0 and 108.0, like 101.1', inFreq);
-  if (action === 'tune') { sheet.close(); return goTo(f); }
-
   const name = inName.value.trim(), url = inUrl.value.trim();
   if (url && !/^https?:\/\/\S+$/i.test(url)) return say('A stream link starts with https:// or http://', inUrl);
-  let s = STATIONS.find(x => Math.abs(x.f - f) < .05);
+  let s = byF(f);
   if (s && !s.custom) {
-    if (!url) return say(`${s.name} is already on ${f.toFixed(1)}. Tap Tune to go there, or paste its stream link to use your own.`, inUrl);
-    if (current === s) { connect(null); desired = null; }
+    if (!url) return say(`${s.name} is already on ${f.toFixed(1)}. Paste its stream link to use your own.`, inUrl);
+    if (current === s) off();
     s.url = url; s.urls = known(s); s.ui = 0; s.dead = false;
-    saveCustom(); sheet.close(); goTo(f); update();
+    saveCustom(); sheet.close(); render(); play(s);
     return toast(`Using your stream link for ${s.name}`);
   }
-  if (!name) return say('Give the station a name so it can go on the dial', inName);
+  if (!name) return say('Give the station a name', inName);
   if (s) {   // same frequency as one of yours: update it
-    if (current === s) { connect(null); desired = null; }
+    if (current === s) off();
     s.name = name; s.url = url; s.q = [name, String(f)]; s.urls = url ? [url] : []; s.dead = false;
-    s.dot.title = `${name} ${f}`;
     toast(`Updated ${name} on ${f.toFixed(1)}`);
   } else {
-    s = customStation({ f, name, url }); addDot(s);
+    s = customStation({ f, name, url });
     toast(url ? `Added ${name} on ${f.toFixed(1)}` : `Added ${name} · looking for its stream…`);
   }
-  saveCustom(); renderPresets(); sheet.close();
-  goTo(f);
-  findStreamFor(s, !!url);
+  saveCustom(); sheet.close(); render();
+  if (url) return play(s);
+  lookup(s).then(() => {
+    saveStreamCache(); render();
+    if (s.urls.length) { toast(`Found a stream for ${s.name}`); play(s); }
+    else toast(`No stream found for ${s.name}. Tap it under “No online stream yet” to add its link.`);
+  });
 });
 
-renderPresets();
+render();
 update();
 findStreams();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
