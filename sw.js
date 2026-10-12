@@ -1,7 +1,7 @@
 // Starlite service worker: keeps the radio's own files available offline.
 // Live streams and the station directory always go straight to the network.
-const CACHE = 'starlite-v5';
-const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'starlite-v6';
+const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './stations.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
