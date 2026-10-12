@@ -82,10 +82,36 @@ body{
     conic-gradient(#0E1C12 0 calc(var(--gap)/2), var(--eye) calc(var(--gap)/2) calc(360deg - var(--gap)/2), #0E1C12 calc(360deg - var(--gap)/2));
   box-shadow:0 0 0 4px var(--brass-dark),inset 0 0 8px #000,0 0 14px rgba(93,240,140,.45);
 }
-.readout{flex:1;min-width:0;padding:7px 10px;border-radius:6px;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);color:#E9C77A}
-.freq{font-size:24px;font-weight:600;line-height:1}
+.readout{
+  display:block;flex:1;min-width:0;padding:7px 10px;border:none;border-radius:6px;text-align:left;cursor:pointer;
+  font-family:inherit;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);color:#E9C77A;
+}
+.freq{display:block;font-size:24px;font-weight:600;line-height:1}
 .freq small{font-size:14px;opacity:.7;margin-left:3px}
-.station{font-size:15px;line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.freq .edit{float:right;font-size:16px;opacity:.55}
+.station{display:block;font-size:15px;line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.sheet{
+  width:min(calc(100% - 32px),420px);max-height:calc(100% - 32px);padding:18px;border:none;border-radius:16px;
+  background:linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));color:#F3DC9B;
+  font-family:"Barlow Condensed","Arial Narrow",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+.sheet::backdrop{background:rgba(20,12,6,.6)}
+.sheet h2{margin:0 0 12px;font:400 24px Limelight,Georgia,serif;color:var(--brass)}
+.sheet h3{margin:16px 0 6px;font-size:18px;font-weight:600}
+.sheet label{display:block;margin-bottom:10px;font-size:17px;font-weight:600}
+.sheet label em{font-style:normal;font-weight:500;opacity:.7}
+.sheet input{
+  display:block;width:100%;margin-top:4px;padding:9px 10px;border:none;border-radius:6px;
+  font:500 18px "Barlow Condensed","Arial Narrow",sans-serif;color:#F3DC9B;background:var(--walnut-dark);box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
+}
+.sheet input::placeholder{color:rgba(243,220,155,.4)}
+.sheet-msg{min-height:1.2em;margin:0 0 8px;font-size:16px;color:#FFD08A}
+.sheet-btns{display:flex;gap:7px}
+.sheet-btns .key{margin-bottom:6px}
+.mine{list-style:none;margin:0;padding:0}
+.mine li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.12);font-size:17px}
+.mine li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mine button{border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;background:var(--walnut-dark);color:#E9C77A}
 .knobs{display:flex;gap:20px}
 .knob-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;color:#EED9A8;font-size:15px}
 .knob{
@@ -161,10 +187,10 @@ body{
       <div class="controls">
         <div class="top-row">
           <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear"></div>
-          <div class="readout" aria-live="polite">
-            <div class="freq"><span id="freq">97.1</span><small>FM</small></div>
-            <div class="station" id="station">Off</div>
-          </div>
+          <button class="readout" id="readout" aria-label="Type a frequency or add a station">
+            <span class="freq"><span id="freq">97.1</span><small>FM</small><span class="edit" aria-hidden="true">✎</span></span>
+            <span class="station" id="station" aria-live="polite">Off</span>
+          </button>
         </div>
         <div class="knobs">
           <div class="knob-wrap">
@@ -187,7 +213,31 @@ body{
     <div class="presets" id="presets" aria-label="Saved stations"></div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <p class="hint">Tap an empty number button to save the station you're on, tap it again later to jump back, and press and hold to replace it. Tap Bank to switch between banks A to F for 30 saved stations. Seek and Auto scan find stations for you. Faded dots on the dial aren't streaming right now.</p>
+  <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+    <form method="dialog" id="sheetForm" novalidate>
+      <h2 id="sheetTitle">Tune or add a station</h2>
+      <label>Frequency (88.0 to 108.0)
+        <input id="inFreq" inputmode="decimal" autocomplete="off" placeholder="e.g. 101.1" required>
+      </label>
+      <label>Station name <em>to add it to the dial</em>
+        <input id="inName" maxlength="40" autocomplete="off" placeholder="e.g. Naija FM">
+      </label>
+      <label>Stream link <em>optional; leave blank and Starlite will search for one</em>
+        <input id="inUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">
+      </label>
+      <p class="sheet-msg" id="sheetMsg" role="alert"></p>
+      <div class="sheet-btns">
+        <button type="button" class="key" id="sheetCancel">Cancel</button>
+        <button type="submit" class="key" id="sheetTune" value="tune">Tune</button>
+        <button type="submit" class="key wide" id="sheetAdd" value="add">Add station</button>
+      </div>
+      <div id="mineBox" hidden>
+        <h3>Your stations</h3>
+        <ul class="mine" id="mine"></ul>
+      </div>
+    </form>
+  </dialog>
+  <p class="hint">Tap an empty number button to save the station you're on, tap it again later to jump back, and press and hold to replace it. Tap Bank to switch between banks A to F for 30 saved stations. Seek and Auto scan find stations for you. Tap the frequency to type one in or add a station you know. Faded dots on the dial aren't streaming right now.</p>
 </main>
 
 <script>
@@ -240,11 +290,29 @@ for (let f = MIN; f <= MAX; f += 0.5) {
   scale.appendChild(t);
   if (major) { const n = document.createElement('div'); n.className = 'num'; n.textContent = f; n.style.left = pct(f) + '%'; scale.appendChild(n); }
 }
-STATIONS.forEach(s => {
+function addDot(s) {
   const dot = document.createElement('span');
   dot.style.left = pct(s.f) + '%'; dot.title = `${s.name} ${s.f}`;
   calls.appendChild(dot); s.dot = dot;
-});
+}
+
+/* Stations you add yourself: { f, name, url } saved on the phone */
+function customStation(c) {
+  const s = { f: c.f, name: c.name, url: c.url || '', custom: true, q: [c.name, String(c.f)], urls: c.url ? [c.url] : [], ui: 0 };
+  STATIONS.push(s);
+  return s;
+}
+try {
+  const list = JSON.parse(localStorage.getItem('starlite-custom') || '[]');
+  if (Array.isArray(list)) list.forEach(c => {
+    const f = Math.round(+c.f * 10) / 10;
+    if (f >= MIN && f <= MAX && c.name && !STATIONS.some(s => Math.abs(s.f - f) < .05)) customStation({ f, name: String(c.name).slice(0, 40), url: c.url });
+  });
+} catch (e) {}
+function saveCustom() {
+  try { localStorage.setItem('starlite-custom', JSON.stringify(STATIONS.filter(s => s.custom).map(s => ({ f: s.f, name: s.name, url: s.url })))); } catch (e) {}
+}
+STATIONS.forEach(addDot);
 
 /* ---------- Finding streams ---------- */
 async function apiGet(path) {
@@ -258,7 +326,7 @@ async function apiGet(path) {
 }
 function score(st, s, term) {
   const n = (st.name || '').toLowerCase(), state = (st.state || '').toLowerCase();
-  if (!n.includes(term.toLowerCase().split(' ')[0])) return -99;
+  if (!n.includes(s.custom ? term.toLowerCase() : term.toLowerCase().split(' ')[0])) return -99;
   let p = 0;
   if (state.includes('lagos') || n.includes('lagos')) p += 4;
   if (n.includes(String(s.f))) p += 4;
@@ -267,32 +335,41 @@ function score(st, s, term) {
   p += Math.min(3, Math.log10((st.votes || 0) + 1));
   return p;
 }
-async function findStreams() {
-  let cache = null;
-  try { cache = JSON.parse(localStorage.getItem('starlite-streams') || 'null'); } catch (e) {}
-  if (cache && Date.now() - cache.t < 7 * 864e5) {
-    STATIONS.forEach(s => s.urls = cache.urls[s.f] || []);
-  } else {
-    await Promise.all(STATIONS.map(async s => {
-      const found = [];
-      for (const term of s.q) {
-        const list = await apiGet(`/json/stations/search?name=${encodeURIComponent(term)}&countrycode=NG&hidebroken=true&limit=25`);
-        list.forEach(st => found.push({ st, p: score(st, s, term) }));
-      }
-      found.sort((a, b) => b.p - a.p);
-      const urls = [];
-      for (const { st, p } of found) {
-        if (p < 1) continue;
-        for (const u of [st.url_resolved, st.url]) {
-          if (!u || urls.includes(u)) continue;
-          if (location.protocol === 'https:' && u.startsWith('http:')) continue; // phones block http streams on https pages
-          urls.push(u);
-        }
-      }
-      s.urls = urls.slice(0, 4);
-    }));
-    try { localStorage.setItem('starlite-streams', JSON.stringify({ t: Date.now(), urls: Object.fromEntries(STATIONS.map(s => [s.f, s.urls])) })); } catch (e) {}
+async function lookup(s) {
+  if (s.url) { s.urls = [s.url]; s.ui = 0; s.dead = false; return; }   // your own link: use just that
+  const found = [];
+  for (const term of s.q) {
+    const list = await apiGet(`/json/stations/search?name=${encodeURIComponent(term)}&countrycode=NG&hidebroken=true&limit=25`);
+    list.forEach(st => found.push({ st, p: score(st, s, term) }));
   }
+  found.sort((a, b) => b.p - a.p);
+  const urls = [];
+  for (const { st, p } of found) {
+    if (p < 1) continue;
+    for (const u of [st.url_resolved, st.url]) {
+      if (!u || urls.includes(u)) continue;
+      if (location.protocol === 'https:' && u.startsWith('http:')) continue; // phones block http streams on https pages
+      urls.push(u);
+    }
+  }
+  s.urls = urls.slice(0, 4); s.ui = 0; s.dead = false;
+}
+let streamCache = { t: 0, urls: {} };
+function saveStreamCache() {
+  streamCache.urls = Object.fromEntries(STATIONS.map(s => [s.f, s.urls]));
+  try { localStorage.setItem('starlite-streams', JSON.stringify(streamCache)); } catch (e) {}
+}
+async function findStreams() {
+  try { streamCache = JSON.parse(localStorage.getItem('starlite-streams') || 'null') || streamCache; } catch (e) {}
+  const fresh = Date.now() - streamCache.t < 7 * 864e5;
+  if (!fresh) streamCache.t = Date.now();
+  await Promise.all(STATIONS.map(async s => {
+    const cached = fresh && streamCache.urls[s.f];
+    if (s.url) s.urls = [s.url];
+    else if (cached) s.urls = cached;
+    else await lookup(s);
+  }));
+  saveStreamCache();
   lookupDone = true;
   update();
 }
@@ -417,7 +494,8 @@ function setFreq(f) { freq = clamp(f, MIN, MAX); update(); }
 let sweepRaf = 0;
 function sweepTo(target, done) {
   cancelAnimationFrame(sweepRaf);
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setFreq(target); done && done(); return; }
+  // No animation frames run while the screen is off or the app is in the background, so jump straight there
+  if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) { setFreq(target); done && done(); return; }
   const start = freq, t0 = performance.now(), dur = Math.max(200, Math.abs(target - start) * 130);
   const step = now => {
     const p = Math.min(1, (now - t0) / dur), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
@@ -538,16 +616,21 @@ const presetBtns = Array.from({ length: PER_BANK }, (_, i) => {
   b.className = 'preset';
   let holdTimer = 0, held = false;
   const clearHold = () => { clearTimeout(holdTimer); b.classList.remove('holding'); };
+  const replace = () => {
+    if (held || presets[slot(i)] === null) return;
+    held = true; clearHold(); saveTo(i, true);
+  };
   b.addEventListener('pointerdown', () => {
     held = false;
     if (presets[slot(i)] === null) return;
     b.classList.add('holding');
-    holdTimer = setTimeout(() => { held = true; b.classList.remove('holding'); saveTo(i, true); }, 650);
+    holdTimer = setTimeout(replace, 650);
   });
   b.addEventListener('pointerup', clearHold);
   b.addEventListener('pointerleave', clearHold);
   b.addEventListener('pointercancel', clearHold);
-  b.addEventListener('contextmenu', e => e.preventDefault());
+  // Android cancels the touch on a long press and fires contextmenu instead, so treat that as the hold too
+  b.addEventListener('contextmenu', e => { e.preventDefault(); replace(); });
   b.addEventListener('click', () => {
     if (held) { held = false; return; }
     if (presets[slot(i)] === null) return saveTo(i, false);
@@ -583,6 +666,73 @@ function markPresets() {
   if (typeof presetBtns === 'undefined') return;
   presetBtns.forEach((b, i) => b.classList.toggle('active', presets[slot(i)] !== null && Math.abs(freq - presets[slot(i)]) < .05));
 }
+
+/* ---------- Type a frequency, or add stations you know ---------- */
+const sheet = $('sheet'), inFreq = $('inFreq'), inName = $('inName'), inUrl = $('inUrl'), sheetMsg = $('sheetMsg');
+let sheetAction = 'tune';
+function parseFreq(v) {
+  const f = Math.round(parseFloat(String(v).replace(',', '.')) * 10) / 10;
+  return f >= MIN && f <= MAX ? f : null;
+}
+function goTo(f) { stopScan(); if (!on) powerBtn.click(); sweepTo(f); }
+function renderMine() {
+  const mine = STATIONS.filter(s => s.custom).sort((a, b) => a.f - b.f), ul = $('mine');
+  $('mineBox').hidden = !mine.length;
+  ul.textContent = '';
+  mine.forEach(s => {
+    const li = document.createElement('li'), label = document.createElement('span'), del = document.createElement('button');
+    label.textContent = `${s.f.toFixed(1)} ${s.name}${lookupDone && !s.urls.length ? ' · no stream yet' : ''}`;
+    del.type = 'button'; del.textContent = 'Remove'; del.setAttribute('aria-label', `Remove ${s.name}`);
+    del.addEventListener('click', () => removeStation(s));
+    li.append(label, del); ul.appendChild(li);
+  });
+}
+function removeStation(s) {
+  STATIONS.splice(STATIONS.indexOf(s), 1); s.dot.remove();
+  if (current === s) { connect(null); desired = null; }
+  presets = presets.map(f => f !== null && Math.abs(f - s.f) < .01 ? null : f);
+  saveCustom(); savePresets(); saveStreamCache(); renderPresets(); renderMine(); update();
+  toast(`Removed ${s.name}`);
+}
+function findStreamFor(s, hadLink) {
+  lookup(s).then(() => {
+    saveStreamCache(); update();
+    if (!hadLink) toast(s.urls.length ? `Found a stream for ${s.name}` : `No stream found for ${s.name}. Tap the frequency to add its link.`);
+  });
+}
+$('readout').addEventListener('click', () => {
+  inFreq.value = freq.toFixed(1); inName.value = ''; inUrl.value = ''; sheetMsg.textContent = '';
+  renderMine();
+  sheet.showModal(); inFreq.select();
+});
+$('sheetCancel').addEventListener('click', () => sheet.close());
+$('sheetTune').addEventListener('click', () => sheetAction = 'tune');
+$('sheetAdd').addEventListener('click', () => sheetAction = 'add');
+$('sheetForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const action = sheetAction; sheetAction = 'tune';   // Enter key in a field means Tune
+  const f = parseFreq(inFreq.value), say = (msg, el) => { sheetMsg.textContent = msg; el.focus(); };
+  if (f === null) return say('Type a frequency between 88.0 and 108.0, like 101.1', inFreq);
+  if (action === 'tune') { sheet.close(); return goTo(f); }
+
+  const name = inName.value.trim(), url = inUrl.value.trim();
+  if (!name) return say('Give the station a name so it can go on the dial', inName);
+  if (url && !/^https?:\/\/\S+$/i.test(url)) return say('A stream link starts with https:// or http://', inUrl);
+  let s = STATIONS.find(x => Math.abs(x.f - f) < .05);
+  if (s && !s.custom) return say(`${s.name} is already on ${f.toFixed(1)}. Tap Tune to go there.`, inFreq);
+  if (s) {   // same frequency as one of yours: update it
+    if (current === s) { connect(null); desired = null; }
+    s.name = name; s.url = url; s.q = [name, String(f)]; s.urls = url ? [url] : []; s.dead = false;
+    s.dot.title = `${name} ${f}`;
+    toast(`Updated ${name} on ${f.toFixed(1)}`);
+  } else {
+    s = customStation({ f, name, url }); addDot(s);
+    toast(url ? `Added ${name} on ${f.toFixed(1)}` : `Added ${name} · looking for its stream…`);
+  }
+  saveCustom(); renderPresets(); sheet.close();
+  goTo(f);
+  findStreamFor(s, !!url);
+});
 
 renderPresets();
 update();
