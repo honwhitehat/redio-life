@@ -437,7 +437,7 @@ function play(s) {
   sel = s; on = true; s.dead = false; s.ui = 0;
   connect(s); saveLive();
 }
-function off() { on = false; stopScan(); connect(null); }
+function off() { on = false; stopScan(); connect(null); applyUpdate(); }
 // ◀ ▶ and Scan move through the stations on the page the current station is on, in the order shown
 function order(p) {
   const list = STATIONS.filter(s => s.page === p && playable(s));
@@ -688,7 +688,17 @@ $('sheetForm').addEventListener('submit', e => {
 render();
 update();
 findStreams();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+/* Updates: check whenever the app comes back to the front, and switch to a new version once the radio is off */
+let updateReady = false;
+function applyUpdate() { if (updateReady && !on) location.reload(); }
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+    setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
+  }).catch(() => {});
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) { updateReady = true; applyUpdate(); } });
+}
 </script>
 </body>
 </html>
