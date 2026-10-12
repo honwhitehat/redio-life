@@ -523,24 +523,16 @@ function render() {
   $('favCount').textContent = favList.length;
 
   if (q) {   // search covers every station on both pages
-    const hits = STATIONS.filter(s => (playable(s) || lagosFM(s)) &&
+    const hits = STATIONS.filter(s => playable(s) &&
       [s.name, s.city, s.state, s.f ? s.f.toFixed(1) : '', s.page === 'lagos' ? 'lagos' : ''].some(x => x && x.toLowerCase().includes(q)));
     const live = hits.filter(playable);
     box.appendChild(group('Search results', `${live.length} found`, [...order('lagos'), ...order('nigeria')].filter(s => live.includes(s))));
-    const none = hits.filter(s => !playable(s));
-    if (none.length) box.appendChild(group('No online stream yet', 'tap to add a link', none.sort((a, b) => a.f - b.f)));
     if (!hits.length) box.appendChild(el('p', 'empty', `Nothing matches “${$('find').value.trim()}”`));
   } else if (page === 'lagos') {
     const fmList = order('lagos').filter(s => !s.online), online = order('lagos').filter(s => s.online);
-    const lagosFMs = STATIONS.filter(lagosFM);
-    box.appendChild(group('Lagos FM', `${fmList.length} of ${lagosFMs.length} streaming`, fmList));
+    box.appendChild(group('Lagos FM', `${fmList.length} stations`, fmList));
     if (!fmList.length) box.lastChild.querySelector('.grid').appendChild(el('p', 'empty', 'Finding stations…'));
     if (online.length) box.appendChild(group('Lagos online stations', `${online.length}`, online));
-    const none = lagosFMs.filter(s => !playable(s)).sort((a, b) => a.f - b.f);
-    if (none.length) {
-      const d = el('details', 'more'), sum = el('summary', '', `Lagos FM with no online stream yet (${none.length}) · tap one to add its link`);
-      d.append(sum, grid(none)); box.appendChild(d);
-    }
   } else {
     const all = order('nigeria');
     REGIONS.forEach(([region, states]) => {
@@ -689,7 +681,7 @@ $('sheetForm').addEventListener('submit', e => {
   lookup(s).then(() => {
     saveStreamCache(); render();
     if (s.urls.length) { toast(`Found a stream for ${s.name}`); play(s); }
-    else toast(`No stream found for ${s.name}. Tap it under “no online stream yet” to add its link.`);
+    else toast(`No stream found for ${s.name}. Tap + Add again with its stream link to play it.`);
   });
 });
 
