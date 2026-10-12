@@ -157,6 +157,7 @@ body{
   .radio{padding:14px;border-radius:24px 24px 14px 14px}
   .dial-face{height:100px}
   .track{inset:10px 16px}
+  .calls span{width:5px;height:5px;margin-left:-2.5px}
   .num{font-size:14px}
   .body{grid-template-columns:1fr}
   .grille{min-height:96px}
@@ -219,7 +220,7 @@ body{
       <label>Frequency (88.0 to 108.0)
         <input id="inFreq" inputmode="decimal" autocomplete="off" placeholder="e.g. 101.1" required>
       </label>
-      <label>Station name <em>to add it to the dial</em>
+      <label>Station name <em>for a new station; not needed to add a link to one already on the dial</em>
         <input id="inName" maxlength="40" autocomplete="off" placeholder="e.g. Naija FM">
       </label>
       <label>Stream link <em>optional; leave blank and Starlite will search for one</em>
@@ -242,31 +243,75 @@ body{
 
 <script>
 /* Starlite Lagos: live streaming radio.
-   Stream links are looked up at runtime from the free Radio Browser directory (radio-browser.info),
-   so they stay current. Found links are cached on the phone for a week. */
+   Stream links below were checked by hand in October 2026. Stations without one (and any link that stops
+   working) are looked up in the free Radio Browser directory (radio-browser.info); found links are cached
+   on the phone for a week. You can also paste your own link for any station. */
+const ZENO = id => `https://stream.zeno.fm/${id}`;
+const ATUNWA = id => `https://${id}-atunwadigital.streamguys1.com/${id}`;
+const ELEKTRAN = 'https://azstream.elektranbroadcast.com';
 const STATIONS = [
-  { f: 88.9,  name: 'Brila FM',       q: ['Brila'] },
-  { f: 89.7,  name: 'Eko FM',         q: ['Eko FM'] },
-  { f: 91.3,  name: 'Lagos Talks',    q: ['Lagos Talks'] },
-  { f: 92.3,  name: 'Inspiration FM', q: ['Inspiration FM', 'Inspiration 92.3'] },
-  { f: 92.9,  name: 'Bond FM',        q: ['Bond FM'] },
-  { f: 93.7,  name: 'Rhythm FM',      q: ['Rhythm 93.7', 'Rhythm FM'] },
-  { f: 95.1,  name: 'Wazobia FM',     q: ['Wazobia'] },
-  { f: 96.5,  name: 'Urban96',        q: ['Urban96', 'Urban 96'] },
-  { f: 96.9,  name: 'Cool FM',        q: ['Cool FM', 'Cool 96.9'] },
-  { f: 97.3,  name: 'Classic FM',     q: ['Classic FM 97.3', 'Classic 97.3'] },
-  { f: 97.7,  name: 'Metro FM',       q: ['Metro FM 97.7', 'Metro FM'] },
-  { f: 98.1,  name: 'Smooth FM',      q: ['Smooth 98.1', 'Smooth FM'] },
-  { f: 98.5,  name: 'Soundcity',      q: ['Soundcity', 'Sound City'] },
-  { f: 99.3,  name: 'Nigeria Info',   q: ['Nigeria Info'] },
-  { f: 99.9,  name: 'Beat FM',        q: ['Beat 99.9', 'Beat FM'] },
-  { f: 100.5, name: 'Raypower',       q: ['Raypower', 'Ray Power'] },
-  { f: 102.3, name: 'Max FM',         q: ['Max FM', 'Max 102.3'] },
-  { f: 103.5, name: 'Radio One',      q: ['Radio One 103.5', 'Radio One'] },
-  { f: 105.3, name: 'Fresh FM',       q: ['Fresh FM Lagos', 'Fresh 105.3'] },
-  { f: 107.5, name: 'Radio Lagos',    q: ['Radio Lagos'] },
+  { f: 88.3,  name: 'Grajos FM',      links: [ZENO('0pundmvbhkutv')] },
+  { f: 88.9,  name: 'Brila FM',       links: [ATUNWA('brilafm'), 'https://atunwadigital.streamguys1.com/brilafm'] },
+  { f: 89.7,  name: 'Eko FM',         links: [`${ELEKTRAN}:8100/radio.mp3`] },
+  { f: 89.9,  name: 'Yanga FM',       links: ['https://audiomax.gridpapaservers.com/listen/yangafm_lagos/yangafm'] },
+  { f: 90.1,  name: 'Lasgidi FM',     links: [`${ELEKTRAN}/listen/lasgidi901/radio.mp3`] },
+  { f: 90.3,  name: 'Voice of the People', links: ['https://stream.brainioustech.com/listen/vop_lagos/radio.mp3'] },
+  { f: 90.7,  name: 'Champion FM',    links: [ZENO('oitwbkzlfk0tv')] },
+  { f: 90.9,  name: 'Top Radio',      links: [`${ELEKTRAN}:8000/radio.mp3`] },
+  { f: 91.3,  name: 'Lagos Talks',    links: [ATUNWA('lagostalks')] },
+  { f: 91.7,  name: 'WFM',            links: ['https://s28.myradiostream.com:11618/;'] },
+  { f: 92.3,  name: 'Inspiration FM', links: [`${ELEKTRAN}/listen/ifm923/radio.mp3`] },
+  { f: 92.7,  name: 'Super FM' },
+  { f: 92.9,  name: 'Bond FM',        links: ['https://go.webgateready.com/bondfm'] },
+  { f: 93.3,  name: 'Hot FM' },
+  { f: 93.5,  name: 'Abim FM',        links: [ZENO('zmvhwhtzgxxtv')] },
+  { f: 93.7,  name: 'Rhythm FM',      links: [ATUNWA('rhythmfmlagos')] },
+  { f: 93.9,  name: 'Kwenu FM' },
+  { f: 94.1,  name: 'Rainbow FM' },
+  { f: 94.5,  name: 'Vybz FM',        links: ['https://mpc.my-control-panel.eu/stream/8138'] },
+  { f: 94.7,  name: 'Dux FM' },
+  { f: 94.9,  name: 'Wash FM',        links: ['https://c34.radioboss.fm:8779/stream'] },
+  { f: 95.1,  name: 'Wazobia FM',     links: [ATUNWA('wazobiafmlagos951')] },
+  { f: 95.3,  name: 'RadioNow',       links: [ATUNWA('radionow')] },
+  { f: 95.7,  name: 'LASU Radio' },
+  { f: 96.1,  name: 'Lagos Traffic Radio' },
+  { f: 96.5,  name: 'Urban96' },
+  { f: 96.7,  name: 'Irawo FM',       links: ['https://stream.group8.africa/irawofmlag'] },
+  { f: 96.9,  name: 'Cool FM',        links: [ATUNWA('coolfmlagos969')] },
+  { f: 97.3,  name: 'Classic FM',     links: [ATUNWA('classicfmlagos')] },
+  { f: 97.7,  name: 'Metro FM',       links: ['https://go.webgateready.com/metrofm'] },
+  { f: 98.1,  name: 'Smooth FM',      links: [ATUNWA('smooth981fm'), 'http://smoothlive.smooth981.fm:8000/smoothlivefm128'] },
+  { f: 98.3,  name: 'Mainland FM' },
+  { f: 98.5,  name: 'Soundcity',      links: ['https://stream.group8.africa/soundcityfmlag'] },
+  { f: 98.9,  name: 'Kiss FM' },
+  { f: 99.1,  name: 'Galaxy FM' },
+  { f: 99.3,  name: 'Nigeria Info',   links: [ATUNWA('nigeriainfofmlagos993')] },
+  { f: 99.7,  name: 'Jubilee FM',     links: ['https://cosmo.shoutca.st/proxy/jubileefm/stream'] },
+  { f: 99.9,  name: 'The Beat',       links: [ATUNWA('beatfmlagos')] },
+  { f: 100.5, name: 'Raypower' },
+  { f: 101.3, name: 'Miliki FM',      links: [ZENO('muhahhtbx9ntv')] },
+  { f: 101.5, name: 'Star FM' },
+  { f: 101.7, name: 'Kids FM',        links: [ATUNWA('kids1017fmlagos')] },
+  { f: 101.9, name: 'Lounge FM' },
+  { f: 102.1, name: 'Hi-Impact FM' },
+  { f: 102.3, name: 'Max FM',         links: ['https://audiomax.gridpapaservers.com/listen/gridpapa_streaming/maxfmlagos'] },
+  { f: 102.7, name: 'Naija FM',       links: [ATUNWA('naijafmlagos')] },
+  { f: 103.1, name: 'Unilag FM',      links: ['https://stream.voltsradio.com/listen/unilag_radio/radio.mp3'] },
+  { f: 103.5, name: 'Radio One',      links: ['https://go.webgateready.com/radioonefm'] },
+  { f: 103.7, name: 'Konga FM' },
+  { f: 103.9, name: 'Law FM' },
+  { f: 104.1, name: 'Kennis FM' },
+  { f: 104.5, name: 'Fame FM' },
+  { f: 104.7, name: 'SMA FM' },
+  { f: 105.1, name: 'City FM',        links: [ATUNWA('city1051')] },
+  { f: 105.3, name: 'Fresh FM',       links: [ZENO('fgcaapesa78uv')] },
+  { f: 105.7, name: 'Okin FM',        links: ['http://65.108.124.70:7380/stream'] },
+  { f: 105.9, name: 'NOUN Radio' },
+  { f: 106.5, name: 'Faaji FM',       links: [ZENO('w7gvnqys01zuv')] },
+  { f: 107.5, name: 'Radio Lagos',    links: [`${ELEKTRAN}/listen/radiolagos1075/radio.mp3`] },
+  { f: 107.7, name: 'Melody FM',      links: ['https://radio.sternhost.com:8370/radio.mp3'] },
 ];
-STATIONS.forEach(s => { s.urls = []; s.ui = 0; });
+STATIONS.forEach(s => { s.links = s.links || []; s.q = [s.name, String(s.f)]; s.urls = []; s.ui = 0; s.url = ''; });
 const MIN = 88, MAX = 108, WIDTH = 0.18;
 const API = ['de1', 'de2', 'fi1', 'nl1', 'at1'].map(h => `https://${h}.api.radio-browser.info`);
 const OTHER_CITIES = /abuja|kano|port ?harcourt|\bph\b|ibadan|onitsha|enugu|benin|uyo|kaduna|ilorin|osogbo|akure|abeokuta|ekiti|jos|calabar|owerri|warri/i;
@@ -298,7 +343,7 @@ function addDot(s) {
 
 /* Stations you add yourself: { f, name, url } saved on the phone */
 function customStation(c) {
-  const s = { f: c.f, name: c.name, url: c.url || '', custom: true, q: [c.name, String(c.f)], urls: c.url ? [c.url] : [], ui: 0 };
+  const s = { f: c.f, name: c.name, url: c.url || '', links: [], custom: true, q: [c.name, String(c.f)], urls: c.url ? [c.url] : [], ui: 0 };
   STATIONS.push(s);
   return s;
 }
@@ -309,8 +354,16 @@ try {
     if (f >= MIN && f <= MAX && c.name && !STATIONS.some(s => Math.abs(s.f - f) < .05)) customStation({ f, name: String(c.name).slice(0, 40), url: c.url });
   });
 } catch (e) {}
+/* Stream links you paste in for the built-in stations: { "89.7": "https://…" } */
+try {
+  const links = JSON.parse(localStorage.getItem('starlite-links') || '{}');
+  STATIONS.forEach(s => { if (!s.custom && typeof links[s.f] === 'string') s.url = links[s.f]; });
+} catch (e) {}
 function saveCustom() {
-  try { localStorage.setItem('starlite-custom', JSON.stringify(STATIONS.filter(s => s.custom).map(s => ({ f: s.f, name: s.name, url: s.url })))); } catch (e) {}
+  try {
+    localStorage.setItem('starlite-custom', JSON.stringify(STATIONS.filter(s => s.custom).map(s => ({ f: s.f, name: s.name, url: s.url }))));
+    localStorage.setItem('starlite-links', JSON.stringify(Object.fromEntries(STATIONS.filter(s => !s.custom && s.url).map(s => [s.f, s.url]))));
+  } catch (e) {}
 }
 STATIONS.forEach(addDot);
 
@@ -327,6 +380,8 @@ async function apiGet(path) {
 function score(st, s, term) {
   const n = (st.name || '').toLowerCase(), state = (st.state || '').toLowerCase();
   if (!n.includes(s.custom ? term.toLowerCase() : term.toLowerCase().split(' ')[0])) return -99;
+  // A bare frequency only counts for a Lagos station or one with the right name, not 92.9 in another city
+  if (/^[\d.]+$/.test(term) && !(state.includes('lagos') || n.includes('lagos') || n.includes(s.name.toLowerCase().split(' ')[0]))) return -99;
   let p = 0;
   if (state.includes('lagos') || n.includes('lagos')) p += 4;
   if (n.includes(String(s.f))) p += 4;
@@ -335,8 +390,9 @@ function score(st, s, term) {
   p += Math.min(3, Math.log10((st.votes || 0) + 1));
   return p;
 }
+const known = s => s.url ? [s.url, ...s.links.filter(u => u !== s.url)] : s.links;   // your own link goes first
 async function lookup(s) {
-  if (s.url) { s.urls = [s.url]; s.ui = 0; s.dead = false; return; }   // your own link: use just that
+  if (s.url || s.links.length) { s.urls = known(s); s.ui = 0; s.dead = false; return; }
   const found = [];
   for (const term of s.q) {
     const list = await apiGet(`/json/stations/search?name=${encodeURIComponent(term)}&countrycode=NG&hidebroken=true&limit=25`);
@@ -357,15 +413,15 @@ async function lookup(s) {
 let streamCache = { t: 0, urls: {} };
 function saveStreamCache() {
   streamCache.urls = Object.fromEntries(STATIONS.map(s => [s.f, s.urls]));
-  try { localStorage.setItem('starlite-streams', JSON.stringify(streamCache)); } catch (e) {}
+  try { localStorage.setItem('starlite-streams-v3', JSON.stringify(streamCache)); } catch (e) {}
 }
 async function findStreams() {
-  try { streamCache = JSON.parse(localStorage.getItem('starlite-streams') || 'null') || streamCache; } catch (e) {}
+  try { streamCache = JSON.parse(localStorage.getItem('starlite-streams-v3') || 'null') || streamCache; } catch (e) {}
   const fresh = Date.now() - streamCache.t < 7 * 864e5;
   if (!fresh) streamCache.t = Date.now();
   await Promise.all(STATIONS.map(async s => {
     const cached = fresh && streamCache.urls[s.f];
-    if (s.url) s.urls = [s.url];
+    if (s.url || s.links.length) s.urls = known(s);
     else if (cached) s.urls = cached;
     else await lookup(s);
   }));
@@ -464,7 +520,7 @@ function update() {
   if (!on) text = 'Off';
   else if (!lookupDone) text = 'Finding Lagos stations…';
   else if (best > .5) {
-    text = !bs.urls.length ? `${bs.name} isn't streaming online`
+    text = !bs.urls.length ? `${bs.name} · no online stream yet`
       : bs.dead || (current === bs && status === 'unavailable') ? `${bs.name} stream is down right now`
       : current === bs && status === 'playing' ? `${bs.name} · live`
       : current === bs && status === 'buffering' ? `${bs.name} · buffering…`
@@ -676,18 +732,23 @@ function parseFreq(v) {
 }
 function goTo(f) { stopScan(); if (!on) powerBtn.click(); sweepTo(f); }
 function renderMine() {
-  const mine = STATIONS.filter(s => s.custom).sort((a, b) => a.f - b.f), ul = $('mine');
+  const mine = STATIONS.filter(s => s.custom || s.url).sort((a, b) => a.f - b.f), ul = $('mine');
   $('mineBox').hidden = !mine.length;
   ul.textContent = '';
   mine.forEach(s => {
     const li = document.createElement('li'), label = document.createElement('span'), del = document.createElement('button');
-    label.textContent = `${s.f.toFixed(1)} ${s.name}${lookupDone && !s.urls.length ? ' · no stream yet' : ''}`;
-    del.type = 'button'; del.textContent = 'Remove'; del.setAttribute('aria-label', `Remove ${s.name}`);
+    label.textContent = `${s.f.toFixed(1)} ${s.name}${!s.custom ? ' · your link' : lookupDone && !s.urls.length ? ' · no stream yet' : ''}`;
+    del.type = 'button'; del.textContent = 'Remove'; del.setAttribute('aria-label', s.custom ? `Remove ${s.name}` : `Remove your link for ${s.name}`);
     del.addEventListener('click', () => removeStation(s));
     li.append(label, del); ul.appendChild(li);
   });
 }
 function removeStation(s) {
+  if (!s.custom) {   // built-in station: just drop your link and search again
+    if (current === s) { connect(null); desired = null; }
+    s.url = ''; saveCustom(); renderMine(); findStreamFor(s, false);
+    return toast(`Removed your link for ${s.name}`);
+  }
   STATIONS.splice(STATIONS.indexOf(s), 1); s.dot.remove();
   if (current === s) { connect(null); desired = null; }
   presets = presets.map(f => f !== null && Math.abs(f - s.f) < .01 ? null : f);
@@ -716,10 +777,16 @@ $('sheetForm').addEventListener('submit', e => {
   if (action === 'tune') { sheet.close(); return goTo(f); }
 
   const name = inName.value.trim(), url = inUrl.value.trim();
-  if (!name) return say('Give the station a name so it can go on the dial', inName);
   if (url && !/^https?:\/\/\S+$/i.test(url)) return say('A stream link starts with https:// or http://', inUrl);
   let s = STATIONS.find(x => Math.abs(x.f - f) < .05);
-  if (s && !s.custom) return say(`${s.name} is already on ${f.toFixed(1)}. Tap Tune to go there.`, inFreq);
+  if (s && !s.custom) {
+    if (!url) return say(`${s.name} is already on ${f.toFixed(1)}. Tap Tune to go there, or paste its stream link to use your own.`, inUrl);
+    if (current === s) { connect(null); desired = null; }
+    s.url = url; s.urls = known(s); s.ui = 0; s.dead = false;
+    saveCustom(); sheet.close(); goTo(f); update();
+    return toast(`Using your stream link for ${s.name}`);
+  }
+  if (!name) return say('Give the station a name so it can go on the dial', inName);
   if (s) {   // same frequency as one of yours: update it
     if (current === s) { connect(null); desired = null; }
     s.name = name; s.url = url; s.q = [name, String(f)]; s.urls = url ? [url] : []; s.dead = false;
