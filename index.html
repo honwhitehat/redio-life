@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
+<!-- saved from url=(0045)file:///home/honwhitehat/Downloads/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Starlite Radio · Lagos</title>
 <meta name="theme-color" content="#3B2414">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;%F0%9F%93%BB&lt;/text&gt;&lt;/svg&gt;">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./index_files/css2" rel="stylesheet">
 <style>
 :root{
   box-sizing:border-box;
@@ -108,6 +108,23 @@ body{
 .key.power[aria-pressed="true"]{box-shadow:0 1px 0 #5A1A14,0 2px 4px rgba(0,0,0,.4)}
 :focus-visible{outline:3px solid #FFE08A;outline-offset:3px}
 .hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+.presets{display:flex;gap:7px;margin-top:14px}
+.preset{
+  flex:1;min-width:0;height:42px;padding:0 4px;border:none;border-radius:6px;cursor:pointer;
+  background:var(--walnut-dark);color:#E9C77A;font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  -webkit-touch-callout:none;user-select:none;touch-action:manipulation;
+}
+.preset.bank{flex:0 0 auto;min-width:62px;color:var(--ink);background:linear-gradient(180deg,#F3DCA4,var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
+.preset.empty{color:rgba(233,199,122,.45)}
+.preset.active{box-shadow:inset 0 2px 5px rgba(0,0,0,.6),0 0 0 2px #E9C77A}
+.preset.holding{background:#5A3A1E}
+.toast{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);
+  max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:#F3DC9B;
+  font-size:17px;box-shadow:0 8px 20px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 @media (max-width:560px){
   .radio{padding:14px;border-radius:24px 24px 14px 14px}
   .dial-face{height:100px}
@@ -118,6 +135,9 @@ body{
   .badge{font-size:22px;bottom:50%;transform:translate(-50%,50%)}
   .controls{width:auto}
   .key{font-size:13px;height:44px}
+  .presets{gap:5px}
+  .preset{font-size:14px}
+  .preset.bank{min-width:54px}
 }
 @media (prefers-reduced-motion: reduce){ .dial-face,.eye,.key{transition:none} }
 </style>
@@ -128,9 +148,9 @@ body{
     <div class="dial">
       <div class="dial-face" id="dial" aria-hidden="true">
         <div class="track" id="track">
-          <div class="calls" id="calls"></div>
-          <div class="scale" id="scale"></div>
-          <div class="needle" id="needle"></div>
+          <div class="calls" id="calls"><span title="Brila FM 88.9" style="left: 4.5%;"></span><span title="Eko FM 89.7" style="left: 8.5%; opacity: 0.2;"></span><span title="Lagos Talks 91.3" style="left: 16.5%; opacity: 0.2;"></span><span title="Inspiration FM 92.3" style="left: 21.5%; opacity: 0.2;"></span><span title="Bond FM 92.9" style="left: 24.5%; opacity: 0.2;"></span><span title="Rhythm FM 93.7" style="left: 28.5%; opacity: 0.2;"></span><span title="Wazobia FM 95.1" style="left: 35.5%;"></span><span title="Urban96 96.5" style="left: 42.5%; opacity: 0.2;"></span><span title="Cool FM 96.9" class="near" style="left: 44.5%;"></span><span title="Classic FM 97.3" style="left: 46.5%; opacity: 0.2;"></span><span title="Metro FM 97.7" style="left: 48.5%;"></span><span title="Smooth FM 98.1" style="left: 50.5%; opacity: 0.2;"></span><span title="Soundcity 98.5" style="left: 52.5%; opacity: 0.2;"></span><span title="Nigeria Info 99.3" style="left: 56.5%;"></span><span title="Beat FM 99.9" style="left: 59.5%; opacity: 0.2;"></span><span title="Raypower 100.5" style="left: 62.5%; opacity: 0.2;"></span><span title="Max FM 102.3" style="left: 71.5%; opacity: 0.2;"></span><span title="Radio One 103.5" style="left: 77.5%; opacity: 0.2;"></span><span title="Fresh FM 105.3" style="left: 86.5%; opacity: 0.2;"></span><span title="Radio Lagos 107.5" style="left: 97.5%; opacity: 0.2;"></span></div>
+          <div class="scale" id="scale"><div class="tick major" style="left: 0%;"></div><div class="num" style="left: 0%;">88</div><div class="tick" style="left: 2.5%; height: 5px;"></div><div class="tick" style="left: 5%;"></div><div class="tick" style="left: 7.5%; height: 5px;"></div><div class="tick major" style="left: 10%;"></div><div class="num" style="left: 10%;">90</div><div class="tick" style="left: 12.5%; height: 5px;"></div><div class="tick" style="left: 15%;"></div><div class="tick" style="left: 17.5%; height: 5px;"></div><div class="tick major" style="left: 20%;"></div><div class="num" style="left: 20%;">92</div><div class="tick" style="left: 22.5%; height: 5px;"></div><div class="tick" style="left: 25%;"></div><div class="tick" style="left: 27.5%; height: 5px;"></div><div class="tick major" style="left: 30%;"></div><div class="num" style="left: 30%;">94</div><div class="tick" style="left: 32.5%; height: 5px;"></div><div class="tick" style="left: 35%;"></div><div class="tick" style="left: 37.5%; height: 5px;"></div><div class="tick major" style="left: 40%;"></div><div class="num" style="left: 40%;">96</div><div class="tick" style="left: 42.5%; height: 5px;"></div><div class="tick" style="left: 45%;"></div><div class="tick" style="left: 47.5%; height: 5px;"></div><div class="tick major" style="left: 50%;"></div><div class="num" style="left: 50%;">98</div><div class="tick" style="left: 52.5%; height: 5px;"></div><div class="tick" style="left: 55%;"></div><div class="tick" style="left: 57.5%; height: 5px;"></div><div class="tick major" style="left: 60%;"></div><div class="num" style="left: 60%;">100</div><div class="tick" style="left: 62.5%; height: 5px;"></div><div class="tick" style="left: 65%;"></div><div class="tick" style="left: 67.5%; height: 5px;"></div><div class="tick major" style="left: 70%;"></div><div class="num" style="left: 70%;">102</div><div class="tick" style="left: 72.5%; height: 5px;"></div><div class="tick" style="left: 75%;"></div><div class="tick" style="left: 77.5%; height: 5px;"></div><div class="tick major" style="left: 80%;"></div><div class="num" style="left: 80%;">104</div><div class="tick" style="left: 82.5%; height: 5px;"></div><div class="tick" style="left: 85%;"></div><div class="tick" style="left: 87.5%; height: 5px;"></div><div class="tick major" style="left: 90%;"></div><div class="num" style="left: 90%;">106</div><div class="tick" style="left: 92.5%; height: 5px;"></div><div class="tick" style="left: 95%;"></div><div class="tick" style="left: 97.5%; height: 5px;"></div><div class="tick major" style="left: 100%;"></div><div class="num" style="left: 100%;">108</div></div>
+          <div class="needle" id="needle" style="left: 44.5%;"></div>
         </div>
       </div>
     </div>
@@ -138,19 +158,19 @@ body{
       <div class="grille"><div class="badge">Starlite Lagos</div></div>
       <div class="controls">
         <div class="top-row">
-          <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear"></div>
+          <div class="eye" id="eye" title="Tuning eye: it closes when a station comes in clear" style="--gap: 70deg;"></div>
           <div class="readout" aria-live="polite">
-            <div class="freq"><span id="freq">97.1</span><small>FM</small></div>
+            <div class="freq"><span id="freq">96.9</span><small>FM</small></div>
             <div class="station" id="station">Off</div>
           </div>
         </div>
         <div class="knobs">
           <div class="knob-wrap">
-            <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100"><div class="cap"></div><div class="mark"></div></div>
+            <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60" style="transform: rotate(27deg);"><div class="cap"></div><div class="mark"></div></div>
             Volume
           </div>
           <div class="knob-wrap">
-            <div class="knob" id="tuneKnob" role="slider" tabindex="0" aria-label="Tuning" aria-valuemin="88" aria-valuemax="108"><div class="cap"></div><div class="mark"></div></div>
+            <div class="knob" id="tuneKnob" role="slider" tabindex="0" aria-label="Tuning" aria-valuemin="88" aria-valuemax="108" aria-valuenow="96.9" aria-valuetext="96.9 FM" style="transform: rotate(480.6deg);"><div class="cap"></div><div class="mark"></div></div>
             Tuning
           </div>
         </div>
@@ -162,8 +182,10 @@ body{
       <button class="key" id="seekFwd" aria-label="Seek to next station">Seek ▶</button>
       <button class="key power" id="power" aria-pressed="false">On / off</button>
     </div>
+    <div class="presets" id="presets" aria-label="Saved stations"><button class="preset bank" aria-label="Preset bank A, 1 of 6. Tap for the next bank.">Bank A</button><button class="preset empty" aria-label="A1: empty. Tap to save the current station.">1 +</button><button class="preset empty" aria-label="A2: empty. Tap to save the current station.">2 +</button><button class="preset empty" aria-label="A3: empty. Tap to save the current station.">3 +</button><button class="preset empty" aria-label="A4: empty. Tap to save the current station.">4 +</button><button class="preset empty" aria-label="A5: empty. Tap to save the current station.">5 +</button></div>
   </div>
-  <p class="hint">Switch it on, then press Seek to jump to the next Lagos station or Auto scan to hop through them all. Turning the knob works too, and it snaps onto a station when you let go. Stations play live over the internet, so you'll need data or Wi-Fi. Faded dots on the dial aren't streaming right now.</p>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <p class="hint">Tap an empty number button to save the station you're on, tap it again later to jump back, and press and hold to replace it. Tap Bank to switch between banks A to F for 30 saved stations. Seek and Auto scan find stations for you. Faded dots on the dial aren't streaming right now.</p>
 </main>
 
 <script>
@@ -385,6 +407,7 @@ function update() {
     noiseGain.gain.setTargetAtTime(hiss, now, .05);
     master.gain.setTargetAtTime(on ? volume * volume : 0, now, .05);
   }
+  markPresets();
   try { localStorage.setItem('starlite-live', JSON.stringify({ f: freq, v: volume })); } catch (e) {}
 }
 function setFreq(f) { freq = clamp(f, MIN, MAX); update(); }
@@ -477,8 +500,92 @@ dial.addEventListener('pointermove', e => { if (dialDown) setFreq(fromX(e.client
 dial.addEventListener('pointerup', () => { if (dialDown) snap(); dialDown = false; });
 dial.addEventListener('pointercancel', () => dialDown = false);
 
+/* ---------- Presets: 6 banks (A–F) × 5 buttons ---------- */
+const PER_BANK = 5, BANKS = 'ABCDEF';
+let presets = Array(PER_BANK * BANKS.length).fill(null), bank = 0;
+try {
+  const p = JSON.parse(localStorage.getItem('starlite-presets-v2') || 'null')
+         || JSON.parse(localStorage.getItem('starlite-presets') || 'null');   // old 5 presets move into bank A
+  if (Array.isArray(p)) presets = presets.map((_, i) => typeof p[i] === 'number' ? p[i] : null);
+  bank = clamp(parseInt(localStorage.getItem('starlite-bank') || '0', 10) || 0, 0, BANKS.length - 1);
+} catch (e) {}
+const presetBox = $('presets'), toastEl = $('toast');
+const stationAt = f => STATIONS.find(s => Math.abs(s.f - f) < .01);
+const slot = i => bank * PER_BANK + i;
+let toastTimer = 0;
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+function savePresets() {
+  try { localStorage.setItem('starlite-presets-v2', JSON.stringify(presets)); localStorage.setItem('starlite-bank', bank); } catch (e) {}
+}
+
+const bankBtn = document.createElement('button');
+bankBtn.className = 'preset bank';
+bankBtn.addEventListener('click', () => {
+  bank = (bank + 1) % BANKS.length;
+  savePresets(); renderPresets();
+  const used = presets.slice(bank * PER_BANK, bank * PER_BANK + PER_BANK).filter(f => f !== null).length;
+  toast(`Bank ${BANKS[bank]} · ${used ? used + ' saved' : 'empty'}`);
+});
+presetBox.appendChild(bankBtn);
+
+const presetBtns = Array.from({ length: PER_BANK }, (_, i) => {
+  const b = document.createElement('button');
+  b.className = 'preset';
+  let holdTimer = 0, held = false;
+  const clearHold = () => { clearTimeout(holdTimer); b.classList.remove('holding'); };
+  b.addEventListener('pointerdown', () => {
+    held = false;
+    if (presets[slot(i)] === null) return;
+    b.classList.add('holding');
+    holdTimer = setTimeout(() => { held = true; b.classList.remove('holding'); saveTo(i, true); }, 650);
+  });
+  b.addEventListener('pointerup', clearHold);
+  b.addEventListener('pointerleave', clearHold);
+  b.addEventListener('pointercancel', clearHold);
+  b.addEventListener('contextmenu', e => e.preventDefault());
+  b.addEventListener('click', () => {
+    if (held) { held = false; return; }
+    if (presets[slot(i)] === null) return saveTo(i, false);
+    stopScan();
+    if (!on) powerBtn.click();
+    sweepTo(presets[slot(i)]);
+  });
+  presetBox.appendChild(b);
+  return b;
+});
+
+function saveTo(i, replacing) {
+  const { s, st } = bestStation();
+  const name = `${BANKS[bank]}${i + 1}`;
+  if (st < .5) return toast('Tune to a station first, then tap to save it');
+  if (presets[slot(i)] === s.f) return toast(`${s.name} is already on ${name}`);
+  presets[slot(i)] = s.f; savePresets(); renderPresets();
+  if (navigator.vibrate) navigator.vibrate(30);
+  toast(`${replacing ? 'Replaced with' : 'Saved'} ${s.name} on ${name}`);
+}
+function renderPresets() {
+  bankBtn.textContent = `Bank ${BANKS[bank]}`;
+  bankBtn.setAttribute('aria-label', `Preset bank ${BANKS[bank]}, ${bank + 1} of ${BANKS.length}. Tap for the next bank.`);
+  presetBtns.forEach((b, i) => {
+    const f = presets[slot(i)], s = f !== null && stationAt(f);
+    b.textContent = s ? `${i + 1} ${s.name}` : `${i + 1} +`;
+    b.classList.toggle('empty', !s);
+    b.setAttribute('aria-label', s ? `${BANKS[bank]}${i + 1}: ${s.name} ${s.f}. Tap to tune, hold to replace.` : `${BANKS[bank]}${i + 1}: empty. Tap to save the current station.`);
+  });
+  markPresets();
+}
+function markPresets() {
+  if (typeof presetBtns === 'undefined') return;
+  presetBtns.forEach((b, i) => b.classList.toggle('active', presets[slot(i)] !== null && Math.abs(freq - presets[slot(i)]) < .05));
+}
+
+renderPresets();
 update();
 findStreams();
 </script>
-</body>
-</html>
+
+
+</body></html>
