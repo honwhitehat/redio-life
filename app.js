@@ -1,4 +1,4 @@
-/* Starlite Radio: Lagos corner plus stations across Nigeria, as a grid. The station list lives in stations.js.
+/* Redio Life: Lagos corner plus stations across Nigeria, as a grid. The station list lives in stations.js.
    Lagos stations without a link are looked up in the free Radio Browser directory (radio-browser.info);
    found links are cached on the phone for a week. You can also paste your own link for any Lagos station. */
 const MIN = 88, MAX = 108;
@@ -192,7 +192,7 @@ function step(dir) {
 
 function setMediaSession(s) {
   if (!('mediaSession' in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({ title: s.name, artist: `${s.f ? fm(s) + ' · ' : ''}${place(s)}`, album: 'Starlite Radio' });
+  navigator.mediaSession.metadata = new MediaMetadata({ title: s.name, artist: `${s.f ? fm(s) + ' · ' : ''}${place(s)}`, album: 'Redio Life' });
 }
 if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('nexttrack', () => { stopScan(); step(1); });

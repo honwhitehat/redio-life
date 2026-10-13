@@ -1,6 +1,6 @@
-# Starlite Radio 📻
+# Redio Life 📻
 
-A retro-style radio for live Nigerian stations, with a Lagos corner up front.
+A retro-style radio for live Nigerian stations, with a Lagos corner up front. *Rédíò* is the everyday Yoruba and Hausa word for radio. (Formerly called Starlite Radio.)
 
 **Listen:** https://honwhitehat.github.io/starlite-radio/
 
@@ -12,11 +12,11 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front.
 
 ## How it works
 
-Starlite plays each station's own public online stream, straight from that station's streaming server. It doesn't record, copy or re-host any audio. The station list and its stream links are in [`stations.js`](stations.js).
+Redio Life plays each station's own public online stream, straight from that station's streaming server. It doesn't record, copy or re-host any audio. The station list and its stream links are in [`stations.js`](stations.js).
 
 ## Disclaimer
 
-Starlite isn't affiliated with any of the stations it lists. All programmes, streams, station names and trademarks belong to their owners.
+Redio Life isn't affiliated with any of the stations it lists. All programmes, streams, station names and trademarks belong to their owners.
 
 If you run a station and want it removed, or its details corrected, please [open an issue](https://github.com/honwhitehat/starlite-radio/issues) and it will be sorted out promptly.
 
@@ -25,7 +25,7 @@ Stream links were checked in October 2026. Stations sometimes change their links
 ## Credits
 
 - **Stream links** were gathered from public directories and checked by hand:
-  - [Radio Browser](https://www.radio-browser.info/), a free community radio directory, which Starlite also uses to look up streams for stations added by hand
+  - [Radio Browser](https://www.radio-browser.info/), a free community radio directory, which Redio Life also uses to look up streams for stations added by hand
   - [Online Radio Box](https://onlineradiobox.com/ng/)
   - [Streema](https://streema.com/radios/country/Nigeria)
   - the stations' own websites

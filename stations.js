@@ -1,4 +1,4 @@
-/* Starlite station list. Stream links were checked by hand in October 2026 from public directories
+/* Redio Life station list. Stream links were checked by hand in October 2026 from public directories
    (Online Radio Box, Radio Browser, Streema) and the stations' own sites. */
 const LAGOS_FM = [
   {"f":88.3,"name":"Grajos FM","links":["https://stream.zeno.fm/0pundmvbhkutv"]},
