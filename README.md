@@ -2,7 +2,7 @@
 
 A retro-style radio for live Nigerian stations, with a Lagos corner up front. *Rédíò* is the everyday Yoruba and Hausa word for radio. (Formerly called Starlite Radio.)
 
-**Listen:** https://honwhitehat.github.io/starlite-radio/
+**Listen:** https://honwhitehat.github.io/redio-life/
 
 - **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
 - **Across Nigeria:** 252 stations from 27 states, grouped by region and state
@@ -18,7 +18,7 @@ Redio Life plays each station's own public online stream, straight from that sta
 
 Redio Life isn't affiliated with any of the stations it lists. All programmes, streams, station names and trademarks belong to their owners.
 
-If you run a station and want it removed, or its details corrected, please [open an issue](https://github.com/honwhitehat/starlite-radio/issues) and it will be sorted out promptly.
+If you run a station and want it removed, or its details corrected, please [open an issue](https://github.com/honwhitehat/redio-life/issues) and it will be sorted out promptly.
 
 Stream links were checked in October 2026. Stations sometimes change their links, so some may stop working until they're updated.
 
