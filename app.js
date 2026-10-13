@@ -395,7 +395,7 @@ $('sheetForm').addEventListener('submit', e => {
   const f = parseFreq(inFreq.value), say = (msg, el) => { sheetMsg.textContent = msg; el.focus(); };
   if (f === null) return say('Type a frequency between 88.0 and 108.0, like 101.1', inFreq);
   const name = inName.value.trim(), url = inUrl.value.trim();
-  if (url && !/^https?:\/\/\S+$/i.test(url)) return say('A stream link starts with https:// or http://', inUrl);
+  if (url && !/^https:\/\/\S+$/i.test(url)) return say(/^http:/i.test(url) ? 'Phones block http:// streams in apps and browsers. Find the https:// link for this station.' : 'A stream link starts with https://', inUrl);
   let s = byF(f);
   if (s && !s.custom) {
     if (!url) return say(`${s.name} is already on ${f.toFixed(1)}. Paste its stream link to use your own.`, inUrl);

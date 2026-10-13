@@ -4,8 +4,8 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front.
 
 **Listen:** https://honwhitehat.github.io/starlite-radio/
 
-- **Lagos corner:** 51 Lagos FM stations and 76 Lagos online stations
-- **Across Nigeria:** 259 stations from 27 states, grouped by region and state
+- **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
+- **Across Nigeria:** 252 stations from 27 states, grouped by region and state
 - Favourites, search by name, town, state or frequency, previous/next, and scan
 - Add your own station, or paste a stream link for one, saved on your phone
 - Works as an installable web app, and as an Android app that wraps this site
