@@ -2,7 +2,7 @@
 
 A retro-style radio for live Nigerian stations, with a Lagos corner up front. *Rédíò* is the everyday Yoruba and Hausa word for radio. (Formerly called Starlite Radio.)
 
-**Listen:** https://honwhitehat.github.io/redio-life/
+**Listen:** https://radio.cybergistplanet.com/
 
 - **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
 - **Across Nigeria:** 252 stations from 27 states, grouped by region and state

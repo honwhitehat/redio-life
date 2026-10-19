@@ -12,19 +12,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: src
+      - id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+          repositories: redio-life-web
       - name: Push the site files to redio-life-web
         env:
-          DEPLOY_KEY: ${{ secrets.WEB_DEPLOY_KEY }}
+          TOKEN: ${{ steps.token.outputs.token }}
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git clone git@github.com:honwhitehat/redio-life-web.git web
+          git clone "https://x-access-token:${TOKEN}@github.com/honwhitehat/redio-life-web.git" web
           rsync -a --delete --exclude .git --exclude .github --exclude CNAME src/ web/
           echo radio.cybergistplanet.com > web/CNAME
           cd web
           git add -A
           if git diff --cached --quiet; then exit 0; fi
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Copy from redio-life ${GITHUB_SHA::7}"
+          git -c user.name="redio-life-sync-honwhitehat[bot]" -c user.email="5387680+redio-life-sync-honwhitehat[bot]@users.noreply.github.com" commit -m "Copy from redio-life ${GITHUB_SHA::7}"
           git push
