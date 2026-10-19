@@ -119,7 +119,7 @@ jobs:
       contents: read
     steps:
       - name: ZAP baseline scan of radio.cybergistplanet.com
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           target: https://radio.cybergistplanet.com/
           fail_action: false
