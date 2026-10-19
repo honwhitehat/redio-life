@@ -24,10 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: pipx install semgrep
       - run: semgrep scan --config auto --sarif --output semgrep.sarif || true
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
         if: ${{ hashFiles('semgrep.sarif') != '' }}
         with:
           sarif_file: semgrep.sarif
@@ -38,12 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install Trivy
         run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
       - name: Dependency & config scan
         run: trivy fs --scanners vuln,secret,misconfig --format sarif --output trivy.sarif --exit-code 0 .
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
         if: ${{ hashFiles('trivy.sarif') != '' }}
         with:
           sarif_file: trivy.sarif
@@ -54,13 +54,13 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - run: pip install checkov
       - run: checkov -d . --soft-fail -o sarif --output-file-path . || true
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
         if: ${{ hashFiles('results_sarif.sarif') != '' }}
         with:
           sarif_file: results_sarif.sarif
@@ -71,22 +71,22 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Generate CycloneDX SBOM
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
           path: .
           format: cyclonedx-json
           output-file: sbom.cyclonedx.json
           upload-artifact: false
       - name: Generate SPDX SBOM
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
           path: .
           format: spdx-json
           output-file: sbom.spdx.json
           upload-artifact: false
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: sbom
           path: sbom.*.json
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
       - name: Install TruffleHog
@@ -119,7 +119,7 @@ jobs:
       contents: read
     steps:
       - name: ZAP baseline scan of radio.cybergistplanet.com
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@7c4deb10e6261301961c86d65d54a516394f9aed # v0.14.0
         with:
           target: https://radio.cybergistplanet.com/
           fail_action: false
