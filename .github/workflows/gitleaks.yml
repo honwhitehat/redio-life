@@ -1,0 +1,17 @@
+# Scans the repo and every pull request for committed secrets. Warn-only:
+# findings are reported in the Actions log and Security tab but do not block merges.
+name: gitleaks
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
