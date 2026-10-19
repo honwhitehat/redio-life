@@ -1,0 +1,127 @@
+# Full security pipeline — SAST, SCA, IaC, SBOM, secrets.
+# Warn-only: every job uses continue-on-error, so nothing blocks a merge.
+# Results upload to the repo's Security tab (code scanning) and as build artifacts.
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+  schedule:
+    - cron: '41 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sast-semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: pipx install semgrep
+      - run: semgrep scan --config auto --sarif --output semgrep.sarif || true
+      - uses: github/codeql-action/upload-sarif@v3
+        if: ${{ hashFiles('semgrep.sarif') != '' }}
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  sca-trivy:
+    name: SCA + IaC (Trivy)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+      - name: Dependency & config scan
+        run: trivy fs --scanners vuln,secret,misconfig --format sarif --output trivy.sarif --exit-code 0 .
+      - uses: github/codeql-action/upload-sarif@v3
+        if: ${{ hashFiles('trivy.sarif') != '' }}
+        with:
+          sarif_file: trivy.sarif
+          category: trivy
+
+  iac-checkov:
+    name: IaC (Checkov)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install checkov
+      - run: checkov -d . --soft-fail -o sarif --output-file-path . || true
+      - uses: github/codeql-action/upload-sarif@v3
+        if: ${{ hashFiles('results_sarif.sarif') != '' }}
+        with:
+          sarif_file: results_sarif.sarif
+          category: checkov
+
+  sbom:
+    name: SBOM (Syft)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+          upload-artifact: false
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.*.json
+      - name: Attach SBOMs to the release
+        if: github.event_name == 'release'
+        run: gh release upload "${GITHUB_REF_NAME}" sbom.cyclonedx.json sbom.spdx.json --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  secrets-trufflehog:
+    name: Secrets (TruffleHog)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install TruffleHog
+        run: curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sudo sh -s -- -b /usr/local/bin
+      - name: Scan filesystem and git history for verified secrets
+        run: trufflehog filesystem . --results=verified,unknown --no-update || true
+
+  dast-zap:
+    name: DAST (OWASP ZAP baseline)
+    # Scans the live site; runs only on schedule or manual trigger, not on every push/PR.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: ZAP baseline scan of radio.cybergistplanet.com
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: https://radio.cybergistplanet.com/
+          fail_action: false
+          allow_issue_writing: false
+          cmd_options: '-a'
