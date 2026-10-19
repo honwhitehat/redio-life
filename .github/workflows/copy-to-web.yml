@@ -1,5 +1,5 @@
 # Copies the site to redio-life-web, which serves it at radio.cybergistplanet.com.
-# This repo keeps serving honwhitehat.github.io/redio-life/, the address the Android app loads.
+# honwhitehat.github.io/redio-life/ only redirects there (see redirect-github-io.yml).
 name: Copy to redio-life-web
 on:
   push:
