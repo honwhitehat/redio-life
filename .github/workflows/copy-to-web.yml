@@ -1,0 +1,30 @@
+# Copies the site to redio-life-web, which serves it at radio.cybergistplanet.com.
+# This repo keeps serving honwhitehat.github.io/redio-life/, the address the Android app loads.
+name: Copy to redio-life-web
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src
+      - name: Push the site files to redio-life-web
+        env:
+          DEPLOY_KEY: ${{ secrets.WEB_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git clone git@github.com:honwhitehat/redio-life-web.git web
+          rsync -a --delete --exclude .git --exclude .github --exclude CNAME src/ web/
+          echo radio.cybergistplanet.com > web/CNAME
+          cd web
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Copy from redio-life ${GITHUB_SHA::7}"
+          git push
