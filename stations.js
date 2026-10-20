@@ -354,7 +354,7 @@ const NIGERIA = [
   {"name":"Afrinaijaradio","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/6nspmkmsknbuv"]},
   {"name":"Agbaletu Radiovision","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/wzefgik5ncfvv"]},
   {"name":"AIM FM RADIO & TV","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/aa6czyqdczitv"]},
-  {"name":"Ajísebí Òyó Radio","city":"Oyo","state":"Oyo","links":["https://stream.zeno.fm/v3geyw3zrzzuv","https://stream-178.surfernetwork.com/v3geyw3zrzzuv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJ2M2dleXczenJ6enV2IiwiaG9zdCI6InN0cmVhbS0xNzguc3VyZmVybmV0d29yay5jb20iLCJydHRsIjo1LCJqdGkiOiI1X2lERXMxNlM5aW1pZzZCVUJfdlNBIiwiaWF0IjoxNzg4MDI2MjcwLCJleHAiOjE3ODgwMjYzMzB9.2JhqLINyX56HaZQucxs5wn7_PDNbhZCwN_sNvvbYdk8"]},
+  {"name":"Ajísebí Òyó Radio","city":"Oyo","state":"Oyo","links":["https://stream.zeno.fm/v3geyw3zrzzuv","https://stream-178.surfernetwork.com/v3geyw3zrzzuv"]},
   {"name":"Aloore Radio Oyo State","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/0zmegeqw6hhvv"]},
   {"name":"Apala Radio","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/fqcszwwxra0uv"]},
   {"name":"Eoblive","city":"Ibadan","state":"Oyo","links":["https://stream.zeno.fm/tvnkn6ayxc9uv"]},
