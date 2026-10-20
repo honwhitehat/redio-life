@@ -1,0 +1,10 @@
+# Paths excluded from Semgrep SAST (gitignore syntax).
+
+# Static redirect stub pages served by GitHub Pages (see redirect-github-io.yml).
+# Semgrep's missing-integrity rule flags the <link rel="canonical"> tag, but
+# Subresource Integrity does not apply to a canonical link (no subresource is
+# fetched, and there is no stable hash for a live page). An inline `nosemgrep`
+# does not help here: Semgrep still emits the finding into SARIF as a suppressed
+# result, which GitHub code scanning surfaces as an open alert. Excluding these
+# trivial redirect stubs keeps the SARIF clean.
+.github/redirect/
