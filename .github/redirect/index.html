@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>Redio Life has moved</title>
-  <link rel="canonical" href="https://radio.cybergistplanet.com/">
+  <!-- rel=canonical fetches no subresource, so Subresource Integrity (SRI) does not apply here -->
+  <link rel="canonical" href="https://radio.cybergistplanet.com/"> <!-- nosemgrep: html.security.audit.missing-integrity.missing-integrity -->
   <script>
     location.replace("https://radio.cybergistplanet.com" + location.pathname.replace(/^\/redio-life/, "") + location.search + location.hash);
   </script>
