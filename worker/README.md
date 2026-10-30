@@ -9,10 +9,11 @@ SQLite database). It fits in Cloudflare's free plan.
 
 | On the dashboard | Where it comes from |
 |---|---|
-| Listening now, and which stations | Each app checks in every minute while a station plays; anyone who hasn't checked in for 2½ minutes stops counting |
+| Listening now, and which stations (also shown on the radio) | Each app checks in every minute while a station plays; anyone who hasn't checked in for 2½ minutes stops counting |
 | Most listening at once | The highest "listening now" each day |
 | Visitors | People told apart for one day only (see Privacy) |
 | Visits | Each time the app or site is opened |
+| Users all time | Each phone or browser the first time it opens the app (counting starts when this goes live). Also shown on the radio |
 | Plays | A station that stayed on for 15 seconds or more, so Scan's 12-second stops don't count |
 | Hours listened, busiest hours | Added up from the check-ins, in Lagos time |
 | Where listeners are | The Nigerian state and country Cloudflare sees the visit coming from |
@@ -25,7 +26,8 @@ Daily numbers are kept for 400 days.
 
 ## Privacy
 
-- No cookies, and nothing is saved on the listener's phone.
+- No cookies. The only thing saved on the listener's phone is a yes/no that it has been counted as a
+  user, so "users all time" counts each phone once. Clearing the app's data or using a new phone counts again.
 - No IP addresses are stored. A visitor is told apart for one day only, by a hash of their IP
   address, browser and that day's date mixed with a secret (`SALT`). Nobody can be followed from
   one day to the next, so "Visitors" over 7 or 30 days is the daily visitors added up.
@@ -55,6 +57,9 @@ Past a limit, extra events are quietly dropped and the radio carries on as norma
 
 Someone with many IP addresses could still add some fake numbers. That takes real effort, and each
 address can only add a little.
+
+The radio reads its two numbers from `/api/public`, which anyone can see and which is cached for
+30 seconds. It's refreshed every 2 minutes while the radio is on screen.
 
 ## Putting it live (one time)
 

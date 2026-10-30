@@ -171,8 +171,8 @@ player.addEventListener('error', () => {
 
 /* ---------- Listener counts for the dashboard (dashboard.html, counted by worker/) ----------
    A station counts as played once it has been on for 15 seconds, so Scan's 12-second stops don't count,
-   and then the app checks in every minute while it plays. No cookies and nothing is saved on the phone:
-   the id below is made fresh each time the app opens. */
+   and then the app checks in every minute while it plays. No cookies; the id below is made fresh each
+   time the app opens. The only thing kept on the phone is a yes/no that it's been counted as a user. */
 const STATS_URL = location.hostname === 'radio.cybergistplanet.com' ? '/api/hit' : '';
 const visitId = Math.random().toString(36).slice(2) + Date.now().toString(36);
 let counted = null, countTimer = 0, beatTimer = 0;
@@ -202,8 +202,28 @@ addEventListener('pagehide', () => stopCount(true));
 {
   let ref = '';
   try { ref = new URL(document.referrer).hostname; } catch (e) {}
-  hit('visit', null, { ref: ref === location.hostname ? '' : ref });
+  const first = !store.get('redio-counted', false);
+  hit('visit', null, { ref: ref === location.hostname ? '' : ref, ...(first && { first: 1 }) });
+  if (first && STATS_URL) store.set('redio-counted', true);
 }
+// Listening now and users all time, under the dial; refreshed every 2 minutes while the app is on screen
+const countsEl = $('counts');
+async function showCounts() {
+  if (!STATS_URL || document.hidden) return;
+  try {
+    const r = await fetch('/api/public', { credentials: 'omit' });
+    if (!r.ok) return;
+    const { live, users } = await r.json();
+    if (typeof live !== 'number' || typeof users !== 'number') return;
+    const n = x => x.toLocaleString('en-NG');
+    $('liveCount').textContent = n(live);
+    $('userCount').textContent = n(users);
+    countsEl.hidden = false;
+  } catch (e) {}
+}
+showCounts();
+setInterval(showCounts, 120000);
+document.addEventListener('visibilitychange', showCounts);
 
 function play(s) {
   if (!s) return;

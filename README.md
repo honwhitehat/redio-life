@@ -16,7 +16,7 @@ Redio Life plays each station's own public online stream, straight from that sta
 
 ## Listener counts
 
-To know how many people listen, the app tells a small counter which station is on, once it has played for 15 seconds and then once a minute while it plays. There are no cookies, nothing is saved on your phone, and no IP addresses are kept. Visitors are told apart for one day only and can't be followed from day to day. See [`worker/README.md`](worker/README.md) for exactly what's counted.
+To know how many people listen, the app tells a small counter which station is on, once it has played for 15 seconds and then once a minute while it plays. The radio shows how many people are listening now and how many have used it. There are no cookies and no IP addresses are kept; the only thing saved on your phone is a yes/no that it's been counted as a user. Visitors are told apart for one day only and can't be followed from day to day. See [`worker/README.md`](worker/README.md) for exactly what's counted.
 
 ## Disclaimer
 

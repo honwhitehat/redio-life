@@ -79,13 +79,25 @@ export default {
       const ref = String(b.ref || '').toLowerCase().replace(/^www\./, '');
       const cf = req.cf || {};
       await stats.hit({
-        t: b.t, at: t, sid, iph, id: b.id ? station(String(b.id)) : '',
+        t: b.t, at: t, sid, iph, id: b.id ? station(String(b.id)) : '', first: b.first === 1,
         ref: /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/.test(ref) && ref.length <= 60 ? ref : '',
         vh: await hash(env.SALT || '', day, ip, ua), device: device(ua),
         country: /^[A-Z]{2}$/.test(cf.country || '') ? cf.country : '',
         region: String(cf.region || '').slice(0, 40),
       });
       return reply(null, 204);   // also when a limit was hit, so the app carries on as normal
+    }
+
+    // The two numbers the radio shows to everyone. Cached for 30 seconds, so the counter stays light.
+    if (url.pathname === '/api/public' && req.method === 'GET') {
+      const cache = caches.default, cacheKey = new Request(url.origin + '/api/public');
+      const hit = await cache.match(cacheKey);
+      if (hit) return hit;
+      const res = new Response(JSON.stringify(await stats.publicNums()), {
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=30', 'X-Robots-Tag': 'noindex' },
+      });
+      await cache.put(cacheKey, res.clone());
+      return res;
     }
 
     if (url.pathname === '/api/stats' && req.method === 'GET') {
@@ -183,6 +195,7 @@ export class Stats extends DurableObject {
 
     if (h.t === 'visit') {
       this.add(day, 'visits', '');
+      if (h.first && hits === 1) { this.add(day, 'users', ''); this.add('total', 'users', ''); }   // a phone's first ever visit
       this.add(day, 'visit_hour', hourOf(t));
       this.add(day, 'source', h.ref || 'Direct / app');
       this.add('total', 'visits', '');
@@ -207,6 +220,14 @@ export class Stats extends DurableObject {
     if (Math.random() < 0.05) this.sweep(t);
   }
 
+  async publicNums() {
+    const t = now();
+    return {
+      live: this.q(`SELECT count(*) AS n FROM live WHERE seen >= ?`, t - LIVE)[0].n,
+      users: (this.q(`SELECT n FROM counts WHERE day = 'total' AND metric = 'users'`)[0] || { n: 0 }).n,
+    };
+  }
+
   async stats(days) {
     const t = now(), today = dayOf(t);
     this.sweep(t);
@@ -228,7 +249,7 @@ export class Stats extends DurableObject {
       live: { n: this.q(`SELECT count(*) AS n FROM live`)[0].n, stations: named(this.q(`SELECT station AS k, count(*) AS n FROM live GROUP BY station ORDER BY n DESC`)) },
       todayNums: { ...daily[today] },
       range: { visitors: sum('visitors'), visits: sum('visits'), plays: sum('plays'), listen: sum('listen') },
-      allTime: { visitors: total('visitors'), visits: total('visits'), plays: total('plays'), listen: total('listen') },
+      allTime: { users: total('users'), visitors: total('visitors'), visits: total('visits'), plays: total('plays'), listen: total('listen') },
       daily: Object.entries(daily).map(([day, v]) => ({ day, ...v })),
       topPlays: named(by('plays', 25)), topListen: named(by('listen', 25)), fails: named(by('fails', 25)),
       playHours: hours('play_hour'), listenHours: hours('listen_hour'),

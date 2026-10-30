@@ -133,8 +133,8 @@ function draw() {
   $('peak').textContent = `Most at once today: ${fmt(d.todayNums.peak)}`;
   $('visitorsLabel').textContent = today ? 'Visitors today' : 'Visitors';
   $('visitors').textContent = fmt(d.range.visitors);
-  $('visits').textContent = today ? `${fmt(d.range.visits)} visits · ${fmt(d.allTime.visitors)} all time`
-    : `Daily visitors added up, ${scope} · ${fmt(d.range.visits)} visits`;
+  $('visits').textContent = today ? `${fmt(d.range.visits)} visits · ${fmt(d.allTime.users || 0)} users all time`
+    : `Daily visitors added up, ${scope} · ${fmt(d.range.visits)} visits · ${fmt(d.allTime.users || 0)} users all time`;
   $('plays').textContent = fmt(d.range.plays);
   $('playsAll').textContent = `${scope} · ${fmt(d.allTime.plays)} all time`;
   $('hours').textContent = hrs(d.range.listen);
