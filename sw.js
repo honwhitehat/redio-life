@@ -1,6 +1,6 @@
 // Redio Life service worker: keeps the radio's own files available offline.
 // Live streams, the station directory and the listener counts always go straight to the network.
-const CACHE = 'starlite-v14';
+const CACHE = 'starlite-v15';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './stations.js', './app.js', './theme.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
@@ -19,6 +19,6 @@ self.addEventListener('fetch', e => {
       if (r.redirected) return Response.redirect(r.url, 302);
       if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
       return r;
-    }).catch(() => caches.match(e.request))
+    }).catch(() => caches.match(e.request, { ignoreSearch: true }))   // offline: the saved copy, whatever ?v= it was loaded with
   );
 });

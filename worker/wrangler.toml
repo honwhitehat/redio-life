@@ -17,6 +17,10 @@ class_name = "Stats"
 tag = "v1"
 new_sqlite_classes = ["Stats"]
 
+# The stream check: tests the next batch of stations every 5 minutes
+[triggers]
+crons = ["*/5 * * * *"]
+
 # Makes src/stations.json from ../stations.js, so only real stations are counted
 [build]
 command = "node build-stations.mjs"

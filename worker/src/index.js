@@ -11,6 +11,7 @@
    live listeners and new visitors a day, set well above what a busy shared mobile connection needs.
    Anything past a limit is quietly ignored, so the radio itself never notices. */
 import { DurableObject } from 'cloudflare:workers';
+import { connect } from 'cloudflare:sockets';
 import STATIONS from './stations.json';   // built from ../stations.js by build-stations.mjs
 
 const BEAT = 60;        // the app checks in every 60 seconds while a station plays
@@ -26,7 +27,7 @@ const LIMIT = {
 };
 const UUID4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const CUSTOM = 'custom', UNLISTED = 'unlisted';
-const NAMES = { [CUSTOM]: ['Stations people added', ''], [UNLISTED]: ['Stations not in the counter’s list yet', 'Redeploy the counter'] };
+const NAMES = { [CUSTOM]: ['Stations people added', ''], [UNLISTED]: ['Other stations', ''] };
 
 // Nigeria is on WAT (UTC+1) all year, so days and hours are Lagos time
 const lagos = t => new Date(t * 1000 + 3600e3).toISOString();
@@ -54,7 +55,69 @@ const reply = (body, status = 200) => new Response(body === null ? null : JSON.s
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
 });
 
+/* ---------- Stream check: is each station actually on air? ----------
+   Every 5 minutes the counter tests the stations it checked longest ago, about 15 at a time (the free plan
+   allows 50 connections a run), so every station with a link is checked about every 2 hours. A station is
+   working if any of its links answers like an audio stream; it's listed as down after 2 failed checks in a row. */
+const CHECK_BUDGET = 45, CHECK_TIMEOUT = 8000, DOWN_AFTER = 2;
+const FETCH_PORTS = new Set(['', '443', '8443', '2053', '2083', '2087', '2096']);   // ports a Worker's fetch() can reach over https
+const AUDIO = /audio|ogg|mpegurl|octet-stream|aac|mpeg|mp2t|x-scpls/i;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error('timed out')), ms))]);
+
+async function probe(link) {
+  const u = new URL(link);
+  if (FETCH_PORTS.has(u.port)) {
+    const r = await fetch(link, { headers: { 'Icy-MetaData': '0', 'User-Agent': 'RedioLife-StreamCheck/1.0' }, redirect: 'follow', signal: AbortSignal.timeout(CHECK_TIMEOUT) });
+    const type = r.headers.get('Content-Type') || '';
+    try { await r.body?.cancel(); } catch (e) {}
+    if (!r.ok) return [false, `HTTP ${r.status}`];
+    return type && !AUDIO.test(type) ? [false, `not audio (${type.split(';')[0]})`] : [true, ''];
+  }
+  // Other ports (lots of Icecast and Shoutcast servers): a direct connection, asking for just the reply headers
+  const sock = connect({ hostname: u.hostname, port: +u.port }, { secureTransport: u.protocol === 'https:' ? 'on' : 'off' });
+  try {
+    const w = sock.writable.getWriter();
+    await w.write(new TextEncoder().encode(`GET ${u.pathname}${u.search} HTTP/1.0\r\nHost: ${u.host}\r\nIcy-MetaData: 0\r\nUser-Agent: RedioLife-StreamCheck/1.0\r\n\r\n`));
+    const reader = sock.readable.getReader(), dec = new TextDecoder();
+    let head = '';
+    while (!head.includes('\r\n\r\n') && head.length < 4096) {
+      const { value, done } = await withTimeout(reader.read(), CHECK_TIMEOUT);
+      if (done) break;
+      head += dec.decode(value, { stream: true });
+    }
+    const m = head.match(/^(?:HTTP\/1\.[01]|ICY) (\d{3})/), code = m ? +m[1] : 0;
+    const type = (head.match(/\r\ncontent-type:\s*([^\r]+)/i) || [])[1] || '';
+    if (!code) return [false, 'no answer'];
+    if (code >= 400) return [false, `HTTP ${code}`];
+    return code < 300 && type && !AUDIO.test(type) ? [false, `not audio (${type.split(';')[0]})`] : [true, ''];
+  } finally { try { await sock.close(); } catch (e) {} }
+}
+
+async function checkStreams(env) {
+  const stats = env.STATS.get(env.STATS.idFromName('redio-life'));
+  const results = [];
+  let budget = CHECK_BUDGET - 2;   // two calls to the counter's database
+  for (const id of await stats.dueStations(20)) {
+    const links = STATIONS[id][2];
+    if (budget < links.length * 2) break;   // a redirect costs a second connection
+    let ok = false, detail = '';
+    for (const link of links) {
+      budget -= 2;
+      for (let attempt = 0; attempt < 2; attempt++) {   // one retry, for a link that timed out
+        try { [ok, detail] = await probe(link); } catch (e) { ok = false; detail = /timed? ?out|abort/i.test(String(e.message)) ? 'timed out' : String(e.message || e).slice(0, 60); }
+        if (ok || detail !== 'timed out' || budget < 2) break;
+        budget -= 2;
+      }
+      if (ok) break;
+    }
+    results.push({ id, ok, detail });
+  }
+  await stats.saveChecks(results, now());
+}
+
 export default {
+  async scheduled(event, env, ctx) { ctx.waitUntil(checkStreams(env)); },
+
   async fetch(req, env) {
     const url = new URL(req.url), t = now(), day = dayOf(t);
     const stats = env.STATS.get(env.STATS.idFromName('redio-life'));
@@ -119,7 +182,8 @@ export class Stats extends DurableObject {
     this.sql = ctx.storage.sql;
     // Version 2 added the limits. Everything before it was testing before launch, so it starts afresh.
     this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER);
-      DROP TABLE IF EXISTS sessions;`);   // left from when the dashboard needed signing in
+      DROP TABLE IF EXISTS sessions;
+      CREATE TABLE IF NOT EXISTS streams (id TEXT PRIMARY KEY, checked INTEGER, fails INTEGER, since INTEGER, detail TEXT);`);   // left from when the dashboard needed signing in
     if ((this.q(`SELECT v FROM meta WHERE k = 'version'`)[0] || { v: 1 }).v < 2) {
       this.sql.exec(`DROP TABLE IF EXISTS live; DROP TABLE IF EXISTS counts; DROP TABLE IF EXISTS visitors; DROP TABLE IF EXISTS stations;
         CREATE TABLE live (sid TEXT PRIMARY KEY, iph TEXT, station TEXT, started INTEGER, seen INTEGER);
@@ -213,6 +277,33 @@ export class Stats extends DurableObject {
     if (Math.random() < 0.05) this.sweep(t);
   }
 
+  // Stations with a link, those never checked first, then the ones checked longest ago
+  async dueStations(n) {
+    const checked = Object.fromEntries(this.q(`SELECT id, checked FROM streams`).map(r => [r.id, r.checked]));
+    return Object.keys(STATIONS).filter(id => STATIONS[id][2].length)
+      .sort((a, b) => (checked[a] || 0) - (checked[b] || 0)).slice(0, n);
+  }
+  async saveChecks(results, t) {
+    for (const { id, ok, detail } of results) {
+      const row = this.q(`SELECT * FROM streams WHERE id = ?`, id)[0];
+      const fails = ok ? 0 : (row ? row.fails : 0) + 1;
+      const since = ok ? 0 : (row && row.fails ? row.since : t);
+      this.sql.exec(`INSERT OR REPLACE INTO streams VALUES (?, ?, ?, ?, ?)`, id, t, fails, since, detail);
+    }
+    // Stations taken out of stations.js (one at a time: Cloudflare allows 100 values per query)
+    for (const { id } of this.q(`SELECT id FROM streams`)) if (!Object.hasOwn(STATIONS, id)) this.sql.exec(`DELETE FROM streams WHERE id = ?`, id);
+  }
+  streamReport() {
+    const withLinks = Object.keys(STATIONS).filter(id => STATIONS[id][2].length);
+    const rows = this.q(`SELECT * FROM streams`);
+    const down = rows.filter(r => r.fails >= DOWN_AFTER).sort((a, b) => a.since - b.since)
+      .map(r => { const [name, place] = nameOf(r.id); return { id: r.id, name, place, since: r.since, checked: r.checked, detail: r.detail }; });
+    return {
+      down, checked: rows.length, total: withLinks.length, notChecked: Object.keys(STATIONS).length - withLinks.length,
+      lastCheck: rows.reduce((m, r) => Math.max(m, r.checked), 0),
+    };
+  }
+
   async publicNums() {
     const t = now();
     return {
@@ -244,9 +335,9 @@ export class Stats extends DurableObject {
       range: { visitors: sum('visitors'), visits: sum('visits'), plays: sum('plays'), listen: sum('listen') },
       allTime: { users: total('users'), visitors: total('visitors'), visits: total('visits'), plays: total('plays'), listen: total('listen') },
       daily: Object.entries(daily).map(([day, v]) => ({ day, ...v })),
-      topPlays: named(by('plays', 25)), topListen: named(by('listen', 25)), fails: named(by('fails', 25)),
+      topPlays: named(by('plays', 25)), topListen: named(by('listen', 25)), streams: this.streamReport(),
       playHours: hours('play_hour'), listenHours: hours('listen_hour'),
-      states: by('state', 40), countries: by('country', 20), devices: by('device', 10), sources: by('source', 15),
+      states: by('state', 40), countries: by('country', 20), sources: by('source', 15),
       stay: STAY.map(([, label]) => ({ k: label, n: (stay.find(r => r.k === label) || { n: 0 }).n })),
     };
   }

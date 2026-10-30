@@ -1,5 +1,5 @@
 // Builds src/stations.json from the site's stations.js, so the counter only accepts real Redio Life
-// stations and uses its own names for them. Wrangler runs this before every `dev` and `deploy`.
+// stations and uses its own names for them, and knows their stream links for the stream check. Wrangler runs this before every `dev` and `deploy`.
 // The ids must match how app.js numbers stations (see addStation there).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -14,7 +14,7 @@ function add(s, base) {
   let id = base, n = 2;
   while (ids.has(id)) id = `${base}-${n++}`;
   ids.add(id);
-  out[id] = [s.name, place(s)];
+  out[id] = [s.name, place(s), (s.links || []).filter(u => u.startsWith('https://'))];   // links are for the stream check
 }
 LAGOS_FM.forEach(s => add({ ...s, page: 'lagos' }, 'lagos:' + s.f.toFixed(1)));
 LAGOS_ONLINE.forEach(s => add({ ...s, page: 'lagos' }, 'lagos-online:' + slug(s.name)));

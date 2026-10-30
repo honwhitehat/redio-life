@@ -18,12 +18,23 @@ SQLite database). It fits in Cloudflare's free plan.
 | Plays | A station that stayed on for 15 seconds or more, so Scan's 12-second stops don't count |
 | Hours listened, busiest hours | Added up from the check-ins, in Lagos time |
 | Where listeners are | The Nigerian state and country Cloudflare sees the visit coming from |
-| Devices | Android app, Android browser, iPhone / iPad or computer |
 | How people found it | The website a visitor came from, such as google.com or whatsapp.com |
 | How long people stay | How long someone listens to one station before switching or stopping |
-| Streams that failed | Stations where none of the stream links would play |
+| Stations not working right now | The counter's own stream check (below) |
 
 Daily numbers are kept for 400 days.
+
+## Stream check
+
+Every 5 minutes the counter tests the stations it checked longest ago, about 15 at a time (the free
+plan allows 50 connections per run), so each station with a link is checked about every 2 hours.
+A station counts as working if any of its links answers like an audio stream, and it's listed as
+not working after 2 failed checks in a row, so a short blip doesn't flag it. Links on unusual ports
+are reached with a direct connection, since a Worker's `fetch` only reaches the standard ones.
+
+The Lagos stations with no link in `stations.js` are found by a lookup on the listener's phone, so
+they can't be checked here. The check runs from Cloudflare's servers, so a station that only lets in
+listeners from Nigeria could show as not working even though it plays there.
 
 ## Privacy
 

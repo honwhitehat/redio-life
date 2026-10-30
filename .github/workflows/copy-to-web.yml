@@ -27,6 +27,8 @@ jobs:
           git clone "https://x-access-token:${TOKEN}@github.com/honwhitehat/redio-life-web.git" web
           rsync -a --delete --exclude .git --exclude .github --exclude CNAME --exclude worker src/ web/
           echo radio.cybergistplanet.com > web/CNAME
+          # Stamp this release on the script links, so browsers never mix a new page with an old cached script
+          sed -i -E "s/\?v=[0-9a-zA-Z]+\"/?v=${GITHUB_SHA::7}\"/g" web/index.html web/dashboard.html
           cd web
           git add -A
           if git diff --cached --quiet; then exit 0; fi
