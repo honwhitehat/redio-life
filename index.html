@@ -77,6 +77,8 @@ body{
 /* Listening now / users all time, a brass plate under the dial */
 .counts{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 22px;margin:10px 0 0;color:var(--label);font-size:17px;letter-spacing:.3px;text-shadow:0 1px 0 rgba(0,0,0,.4)}
 .counts[hidden]{display:none}
+.counts .dash-link{color:var(--glow);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.counts .dash-link:hover{color:var(--brass-hi)}
 .counts b{font-weight:600;color:var(--glow);font-variant-numeric:tabular-nums;margin-right:4px}
 .counts .live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--eye);box-shadow:0 0 8px var(--eye)}
 /* Now-playing panel */
@@ -254,6 +256,7 @@ details.more .grid{margin-top:8px}
     <p class="counts" id="counts" hidden>
       <span><i class="live-dot" aria-hidden="true"></i><b id="liveCount">0</b> listening now</span>
       <span><b id="userCount">0</b> users all time</span>
+      <a class="dash-link" href="dashboard.html">Full dashboard ›</a>
     </p>
     <div class="controls">
       <div class="knob-wrap">

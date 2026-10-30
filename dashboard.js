@@ -1,6 +1,5 @@
 /* Redio Life dashboard: reads /api/stats from the stats counter in worker/ and draws it.
-   The key is only sent to /api/login and never kept in the browser. Signing in gives a 7-day session
-   in a cookie this page's scripts can't read; Sign out ends it on the counter too. */
+   It's open to everyone; the counter caches the numbers for 20 seconds. */
 const $ = id => document.getElementById(id);
 // The site can't send anti-framing headers (GitHub Pages), so refuse to run inside another site's frame
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Redio Life dashboard can’t be opened inside another page'); }
@@ -8,10 +7,10 @@ const store = {
   get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
   set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} },
 };
-try { localStorage.removeItem('redio-dash-key'); } catch (e) {}   // older versions kept the key here
+try { localStorage.removeItem('redio-dash-key'); } catch (e) {}   // an older version kept a key here
 let days = +store.get('redio-dash-days', 7) || 7;
 let dailyM = store.get('redio-dash-daily', 'visitors'), hourM = store.get('redio-dash-hour', 'listen');
-let data = null, timer = 0, signedIn = false;
+let data = null, timer = 0;
 
 const fmt = n => Math.round(n).toLocaleString('en-NG');
 const hrs = s => s >= 36000 ? fmt(s / 3600) : (s / 3600).toFixed(1).replace(/\.0$/, '');
@@ -21,46 +20,21 @@ const COUNTRY = (() => { try { const n = new Intl.DisplayNames(['en'], { type: '
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
 
-/* ---------- Signing in ---------- */
-function showLogin(msg) {
-  clearTimeout(timer);
-  $('dash').hidden = true; $('login').hidden = false; $('keyMsg').textContent = msg || '';
-  $('key').focus();
-}
-$('keyForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const body = JSON.stringify({ key: $('key').value.trim() });
-  $('key').value = '';
-  try {
-    const r = await fetch('/api/login', { method: 'POST', body, credentials: 'same-origin', cache: 'no-store' });
-    if (r.status === 401) return showLogin('That key didn’t work. Check it and try again.');
-    if (r.status === 429) return showLogin('Too many wrong keys from this connection. Try again in an hour.');
-    if (!r.ok) throw new Error(r.status);
-    load();
-  } catch (err) { showLogin('Couldn’t reach the stats counter. Check your connection and try again.'); }
-});
-$('logout').addEventListener('click', async () => {
-  signedIn = false; data = null;
-  try { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); } catch (e) {}
-  showLogin('Signed out.');
-});
-
 async function load() {
   clearTimeout(timer);
   try {
-    const r = await fetch(`/api/stats?days=${days}`, { credentials: 'same-origin', cache: 'no-store' });
-    if (r.status === 401) { signedIn = false; data = null; return showLogin(); }
+    const r = await fetch(`/api/stats?days=${days}`, { credentials: 'omit' });
     if (!r.ok) throw new Error(r.status);
-    data = await r.json(); signedIn = true;
-    $('login').hidden = true; $('dash').hidden = false;
+    data = await r.json();
+    $('loading').hidden = true; $('dash').hidden = false;
     draw();
   } catch (e) {
-    if (!data) return showLogin('Couldn’t reach the stats counter. Check your connection and try again.');
+    if (!data) { $('loading').textContent = 'Couldn’t reach the stats counter. Trying again…'; timer = setTimeout(load, 10000); return; }
     $('updated').textContent = `Couldn’t refresh (${e.message || 'offline'}); showing numbers from ${ago(data.at)}`;
   }
   timer = setTimeout(load, 20000);
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && signedIn) load(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 
 /* ---------- Toggles ---------- */
 function seg(id, attr, value, onPick) {

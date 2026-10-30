@@ -1,7 +1,8 @@
 # Redio Life stats counter
 
 A small Cloudflare Worker that counts visits, plays and who's listening right now, for the
-dashboard at **https://radio.cybergistplanet.com/dashboard.html**. It runs on
+dashboard at **https://radio.cybergistplanet.com/dashboard.html**, which is open to everyone and
+linked from the radio ("Full dashboard"). It runs on
 `radio.cybergistplanet.com/api/*` and keeps its numbers in one Durable Object (a small
 SQLite database). It fits in Cloudflare's free plan.
 
@@ -45,7 +46,6 @@ one address:
 | Events | 60 a minute | about 1 a minute |
 | Listening at once | 25 | 1 |
 | New visitors | 300 a day | 1 |
-| Wrong dashboard keys | 20 an hour, then locked out for the rest of the hour | 0 |
 
 Past a limit, extra events are quietly dropped and the radio carries on as normal. On top of that:
 
@@ -72,29 +72,17 @@ npm install
 npx wrangler login
 ```
 
-Set the two secrets. Use long random values, for example from `openssl rand -base64 32`:
-
-```bash
-npx wrangler secret put DASH_KEY
-```
+Set the secret. Use a long random value, for example from `openssl rand -base64 32`:
 
 ```bash
 npx wrangler secret put SALT
 ```
 
-`DASH_KEY` is what you type to open the dashboard. `SALT` is never typed anywhere; it only mixes
-up the daily visitor hashes.
+`SALT` is never typed anywhere; it only mixes up the daily visitor hashes. The counter refuses to
+run without one of at least 16 characters.
 
-### Signing in to the dashboard
-
-The key is sent once, to `/api/login`, and is never saved in the browser. The counter answers with a
-random 7-day session in a cookie the page's scripts can't read (`HttpOnly`), sent only over HTTPS to
-`/api/` on this site (`Secure`, `SameSite=Strict`). The counter keeps only a hash of it.
-
-- **Sign out** on the dashboard ends that session on the counter straight away.
-- **Changing `DASH_KEY`** (`npx wrangler secret put DASH_KEY`) signs every device out at once. Do this
-  if you think the key has been seen by anyone else.
-- At most 20 sessions are kept; signing in a 21st time drops the oldest.
+The dashboard needs no key: anyone can open it. Its numbers are cached for 20 seconds and shared
+by everyone looking, so lots of visitors can't overload the counter.
 
 Then deploy (this also builds the station list from `stations.js`):
 
@@ -109,7 +97,7 @@ https://radio.cybergistplanet.com/dashboard.html. You should see yourself under 
 
 - Run `npx wrangler deploy` from `worker/` after changing `src/index.js`.
 - `npx wrangler tail` shows requests as they come in.
-- To try it on your computer, put `DASH_KEY="..."` and `SALT="..."` in `worker/.dev.vars`
+- To try it on your computer, put `SALT="..."` in `worker/.dev.vars`
   (git ignores this file) and run `npx wrangler dev`.
 
 ## Free plan limits
