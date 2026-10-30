@@ -79,6 +79,13 @@ body{
 .counts[hidden]{display:none}
 .counts .dash-link{color:var(--glow);font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .counts .dash-link:hover{color:var(--brass-hi)}
+.dash-sheet{width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--wall-shade);display:none;flex-direction:column}
+.dash-sheet[open]{display:flex}
+.dash-sheet::backdrop{background:rgba(0,0,0,.6)}
+.dash-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;padding-top:max(8px,env(safe-area-inset-top));
+  background:var(--walnut-dark);color:var(--label);font-size:16px}
+.dash-bar .key{flex:none;padding:8px 18px}
+.dash-sheet iframe{flex:1;width:100%;border:0;background:var(--wall-shade)}
 .counts b{font-weight:600;color:var(--glow);font-variant-numeric:tabular-nums;margin-right:4px}
 .counts .live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--eye);box-shadow:0 0 8px var(--eye)}
 /* Now-playing panel */
@@ -245,7 +252,7 @@ details.more .grid{margin-top:8px}
 .theme-pick select{font:600 17px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--glow);background:var(--walnut-dark);
   border:2px solid var(--brass-dark);border-radius:10px;padding:6px 10px;cursor:pointer}
 </style>
-<script src="theme.js"></script>
+<script src="theme.js?v=202610301404"></script>
 </head>
 <body>
 <main class="room">
@@ -267,7 +274,7 @@ details.more .grid{margin-top:8px}
     <p class="counts" id="counts" hidden>
       <span><i class="live-dot" aria-hidden="true"></i><b id="liveCount">0</b> listening now</span>
       <span><b id="userCount">0</b> users all time</span>
-      <a class="dash-link" href="dashboard.html">Full dashboard ›</a>
+      <a class="dash-link" id="dashLink" href="dashboard.html">Full dashboard ›</a>
     </p>
     <div class="controls">
       <div class="knob-wrap">
@@ -320,6 +327,11 @@ details.more .grid{margin-top:8px}
     </form>
   </dialog>
   <label class="theme-pick">Colour <select id="themePick"></select></label>
+  <!-- The dashboard opens on top of the radio, so the station keeps playing -->
+  <dialog class="dash-sheet" id="dashSheet" aria-label="Redio Life dashboard">
+    <div class="dash-bar"><span>Dashboard · your station keeps playing</span><button type="button" class="key" id="dashClose">Close</button></div>
+    <iframe id="dashFrame" title="Redio Life dashboard"></iframe>
+  </dialog>
   <section class="about">
     <h2>Uses data</h2>
     <p>Stations stream over the internet, so they use your data or Wi‑Fi.</p>
@@ -328,7 +340,7 @@ details.more .grid{margin-top:8px}
   </section>
 </main>
 
-<script src="stations.js"></script>
-<script src="app.js"></script>
+<script src="stations.js?v=202610301404"></script>
+<script src="app.js?v=202610301404"></script>
 </body>
 </html>

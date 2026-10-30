@@ -1,8 +1,12 @@
 /* Redio Life dashboard: reads /api/stats from the stats counter in worker/ and draws it.
    It's open to everyone; the counter caches the numbers for 20 seconds. */
 const $ = id => document.getElementById(id);
-// The site can't send anti-framing headers (GitHub Pages), so refuse to run inside another site's frame
-if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Redio Life dashboard can’t be opened inside another page'); }
+// The site can't send anti-framing headers (GitHub Pages), so refuse to run inside another site's frame.
+// Inside the radio's own page is fine: that's how it opens without stopping the station.
+let framedBy = '';
+try { if (window.top !== window.self) framedBy = window.top.location.origin === location.origin ? 'radio' : 'other'; } catch (e) { framedBy = 'other'; }
+if (framedBy === 'other') { document.documentElement.textContent = ''; throw new Error('Redio Life dashboard can’t be opened inside another page'); }
+if (framedBy === 'radio') document.documentElement.classList.add('in-radio');
 const store = {
   get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
   set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} },
@@ -149,11 +153,29 @@ function draw() {
   list($('topListen'), d.topListen, { ...station, show: r => `${hrs(r.n)} h`, head: ['Station', 'Hours'] });
   list($('states'), d.states, { empty: 'No visitors from Nigeria yet', head: ['State', 'Visitors'] });
   list($('countries'), d.countries, { name: r => COUNTRY(r.k), head: ['Country', 'Visitors'] });
-  list($('devices'), d.devices, { head: ['Device', 'Visitors'] });
   list($('sources'), d.sources, { head: ['Came from', 'Visits'] });
   list($('stay'), d.stay.some(r => r.n) ? d.stay : [], { head: ['Stayed for', 'Listens'] });
-  list($('fails'), d.fails, { ...station, show: r => `${fmt(r.n)}×`, empty: 'No failed streams. All good.', head: ['Station', 'Failed'] });
-  $('fails').querySelectorAll('td.n').forEach(td => td.classList.add('down'));
+  const sr = d.streams || { down: [], checked: 0, total: 0, notChecked: 0, lastCheck: 0 };
+  const lagosTime = t => new Date(t * 1000).toLocaleString('en-GB', { timeZone: 'Africa/Lagos', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const box = $('down'); box.textContent = '';
+  if (!sr.checked) box.appendChild(el('p', 'empty', 'The first stream check hasn’t finished yet. Give it a few minutes.'));
+  else if (!sr.down.length) box.appendChild(el('p', 'empty', 'Every checked station is playing. All good.'));
+  else {
+    const t = el('table'), hr = el('tr');
+    ['Station', 'Not working since', 'What happened'].forEach((h, i) => hr.appendChild(el('th', i === 1 ? 'n' : '', h)));
+    t.appendChild(el('thead')).appendChild(hr);
+    const tb = t.appendChild(el('tbody'));
+    sr.down.forEach(r => {
+      const tr = el('tr'), nm = el('td', 'name', r.name);
+      if (r.place) nm.appendChild(el('small', '', r.place));
+      tr.append(nm, el('td', 'n down', lagosTime(r.since)), el('td', '', r.detail || 'No answer'));
+      tb.appendChild(tr);
+    });
+    box.appendChild(t);
+  }
+  $('downNote').textContent = `${fmt(sr.down.length)} not working out of ${fmt(sr.checked)} checked (${fmt(sr.total)} have a stream link). `
+    + `Each station is checked about every 2 hours${sr.lastCheck ? `; last check ${lagosTime(sr.lastCheck)}` : ''}. `
+    + (sr.notChecked ? `${fmt(sr.notChecked)} Lagos stations are found by a lookup on the phone, so they can’t be checked here.` : '');
   $('updated').textContent = `Updated ${new Date(d.at * 1000).toLocaleTimeString('en-GB', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' })} Lagos time`;
 }
 

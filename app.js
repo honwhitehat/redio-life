@@ -484,6 +484,19 @@ $('sheetForm').addEventListener('submit', e => {
 render();
 update();
 findStreams();
+/* Full dashboard: opens on top of the radio instead of leaving the page, so the station keeps playing */
+{
+  const sheet = $('dashSheet'), frame = $('dashFrame');
+  $('dashLink').addEventListener('click', e => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;   // opening it in a new tab still works
+    e.preventDefault();
+    frame.src = 'dashboard.html';
+    sheet.showModal();
+  });
+  $('dashClose').addEventListener('click', () => sheet.close());
+  sheet.addEventListener('close', () => { frame.src = 'about:blank'; });   // stops the dashboard refreshing while closed
+}
+
 /* Colour themes (the list and applyTheme are in theme.js) */
 {
   const pick = $('themePick'), dark = matchMedia('(prefers-color-scheme: dark)');
