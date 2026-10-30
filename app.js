@@ -482,6 +482,15 @@ $('sheetForm').addEventListener('submit', e => {
 render();
 update();
 findStreams();
+/* Colour themes (the list and applyTheme are in theme.js) */
+{
+  const pick = $('themePick'), dark = matchMedia('(prefers-color-scheme: dark)');
+  THEMES.forEach(([k, label]) => pick.appendChild(new Option(label, k)));
+  pick.value = store.get('redio-theme', 'auto');
+  if (!pick.value) pick.value = 'auto';
+  pick.addEventListener('change', () => { store.set('redio-theme', pick.value); applyTheme(pick.value); });
+  dark.addEventListener('change', () => applyTheme(pick.value));   // keeps the phone-bar colour right in "Match my phone"
+}
 /* Updates: check whenever the app comes back to the front, and switch to a new version once the radio is off */
 let updateReady = false;
 function applyUpdate() { if (updateReady && !on) location.reload(); }
