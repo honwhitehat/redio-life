@@ -169,7 +169,10 @@ details.more{margin-top:18px}
 details.more summary{cursor:pointer;color:var(--label);font-size:18px;font-weight:600;padding:4px 2px}
 details.more .grid{margin-top:8px}
 .empty{grid-column:1/-1;margin:0;color:var(--label);opacity:.8;font-size:17px}
-.hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+.about{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+.about h2{margin:18px 0 4px;font:400 20px Limelight,Georgia,serif;letter-spacing:.02em}
+.about h2:first-child{margin-top:0}
+.about p{margin:0}
 .toast{
   position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);
   max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:var(--glow);
@@ -303,7 +306,14 @@ details.more .grid{margin-top:8px}
     </form>
   </dialog>
   <label class="theme-pick">Colour <select id="themePick"></select></label>
-  <p class="hint">Tap a station to play it, and tap it again to switch off. Tap ☆ to keep it in Favourites at the top. Lagos corner has Lagos stations; Across Nigeria has the rest, by region and state. ◀ and ▶ go to the previous or next station, and Scan plays each one for 12 seconds. Tap + Add to add a Lagos station you know or paste a stream link.</p>
+  <section class="about">
+    <h2>How to use Redio Life</h2>
+    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
+    <h2>Uses data</h2>
+    <p>Stations stream over the internet, so they use your data or Wi‑Fi.</p>
+    <h2>Disclaimer</h2>
+    <p>Redio Life links to streams provided by the stations. We don’t own or control any station, its content, or its availability. Names and logos belong to their owners. The app is provided as is, and we’re not responsible for data charges or interrupted streams.</p>
+  </section>
 </main>
 
 <script src="stations.js"></script>
