@@ -54,8 +54,9 @@ function same(a, b) {   // compares two secrets without leaking how much of them
   return d === 0;
 }
 
-const station = id => id === CUSTOM ? CUSTOM : STATIONS[id] ? id : UNLISTED;
-const nameOf = id => NAMES[id] || STATIONS[id] || [id, ''];
+// Object.hasOwn, so ids like "constructor" or "__proto__" can't reach built-in object properties
+const station = id => id === CUSTOM ? CUSTOM : Object.hasOwn(STATIONS, id) ? id : UNLISTED;
+const nameOf = id => Object.hasOwn(NAMES, id) ? NAMES[id] : Object.hasOwn(STATIONS, id) ? STATIONS[id] : [String(id), ''];
 const reply = (body, status = 200) => new Response(body === null ? null : JSON.stringify(body), {
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
 });
@@ -65,12 +66,15 @@ export default {
     const url = new URL(req.url), t = now(), day = dayOf(t);
     const stats = env.STATS.get(env.STATS.idFromName('redio-life'));
     const ip = req.headers.get('CF-Connecting-IP') || '', ua = req.headers.get('User-Agent') || '';
-    const iph = await hash(env.SALT || '', day, ip);
+    // Without the secret, the daily hashes could be worked back to IP addresses, so count nothing
+    if (!env.SALT || env.SALT.length < 16) return reply({ error: 'Counter not set up' }, 503);
+    const iph = await hash(env.SALT, day, ip);
 
     if (url.pathname === '/api/hit' && req.method === 'POST') {
       const origins = (env.ORIGINS || '').split(',').map(s => s.trim());
       if (!origins.includes(req.headers.get('Origin'))) return reply(null, 403);
-      if (+(req.headers.get('Content-Length') || 0) > 512) return reply(null, 413);
+      const size = +req.headers.get('Content-Length');   // the app always sends one; this stops huge or endless bodies
+      if (!size || size > 512) return reply(null, 413);
       let b;
       try { b = JSON.parse((await req.text()).slice(0, 512)); } catch (e) { return reply(null, 400); }
       if (!b || !['visit', 'play', 'beat', 'stop', 'fail'].includes(b.t)) return reply(null, 400);
@@ -81,7 +85,7 @@ export default {
       await stats.hit({
         t: b.t, at: t, sid, iph, id: b.id ? station(String(b.id)) : '', first: b.first === 1,
         ref: /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/.test(ref) && ref.length <= 60 ? ref : '',
-        vh: await hash(env.SALT || '', day, ip, ua), device: device(ua),
+        vh: await hash(env.SALT, day, ip, ua), device: device(ua),
         country: /^[A-Z]{2}$/.test(cf.country || '') ? cf.country : '',
         region: String(cf.region || '').slice(0, 40),
       });

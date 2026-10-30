@@ -1,11 +1,13 @@
 /* Redio Life dashboard: reads /api/stats from the stats counter in worker/ and draws it.
    The dashboard key is kept on this device only, so you don't have to type it each time. */
 const $ = id => document.getElementById(id);
+// The site can't send anti-framing headers (GitHub Pages), so refuse to run inside another site's frame
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Redio Life dashboard can’t be opened inside another page'); }
 const store = {
   get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
   set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} },
 };
-const API = new URLSearchParams(location.search).get('api') || '/api/stats';   // ?api= is for trying it against a local copy
+const API = '/api/stats';
 let key = store.get('redio-dash-key', ''), days = +store.get('redio-dash-days', 7) || 7;
 let dailyM = store.get('redio-dash-daily', 'visitors'), hourM = store.get('redio-dash-hour', 'listen');
 let data = null, timer = 0;
