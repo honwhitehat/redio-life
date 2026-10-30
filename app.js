@@ -174,7 +174,9 @@ player.addEventListener('error', () => {
    and then the app checks in every minute while it plays. No cookies; the id below is made fresh each
    time the app opens. The only thing kept on the phone is a yes/no that it's been counted as a user. */
 const STATS_URL = location.hostname === 'radio.cybergistplanet.com' ? '/api/hit' : '';
-const visitId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+// A random UUID v4 for this visit; older Android WebViews without randomUUID build one from getRandomValues
+const visitId = crypto.randomUUID ? crypto.randomUUID() : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
+  c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
 let counted = null, countTimer = 0, beatTimer = 0;
 function hit(t, s, more, beacon) {
   if (!STATS_URL) return;

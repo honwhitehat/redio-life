@@ -26,6 +26,7 @@ Daily numbers are kept for 400 days.
 
 ## Privacy
 
+- Each time the app opens it makes a random UUID v4 for that visit, kept in memory only.
 - No cookies. The only thing saved on the listener's phone is a yes/no that it has been counted as a
   user, so "users all time" counts each phone once. Clearing the app's data or using a new phone counts again.
 - No IP addresses are stored. A visitor is told apart for one day only, by a hash of their IP

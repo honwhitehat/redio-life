@@ -25,6 +25,7 @@ const LIMIT = {
   perVisitor: 2000,    // events a day from one visitor
   keyTries: 20,        // wrong dashboard keys an hour, then that connection is locked out for the hour
 };
+const UUID4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const CUSTOM = 'custom', UNLISTED = 'unlisted';
 const NAMES = { [CUSTOM]: ['Stations people added', ''], [UNLISTED]: ['Stations not in the counter’s list yet', 'Redeploy the counter'] };
 
@@ -78,7 +79,7 @@ export default {
       let b;
       try { b = JSON.parse((await req.text()).slice(0, 512)); } catch (e) { return reply(null, 400); }
       if (!b || !['visit', 'play', 'beat', 'stop', 'fail'].includes(b.t)) return reply(null, 400);
-      const sid = /^[a-z0-9]{8,32}$/.test(b.sid) ? b.sid : '';
+      const sid = UUID4.test(b.sid) ? b.sid : '';   // the app makes a fresh UUID v4 each time it opens
       if (!sid || device(ua) === 'Bot') return reply(null, 204);
       const ref = String(b.ref || '').toLowerCase().replace(/^www\./, '');
       const cf = req.cf || {};
