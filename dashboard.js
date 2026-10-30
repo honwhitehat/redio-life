@@ -1,5 +1,6 @@
 /* Redio Life dashboard: reads /api/stats from the stats counter in worker/ and draws it.
-   The dashboard key is kept on this device only, so you don't have to type it each time. */
+   The key is only sent to /api/login and never kept in the browser. Signing in gives a 7-day session
+   in a cookie this page's scripts can't read; Sign out ends it on the counter too. */
 const $ = id => document.getElementById(id);
 // The site can't send anti-framing headers (GitHub Pages), so refuse to run inside another site's frame
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Redio Life dashboard can’t be opened inside another page'); }
@@ -7,10 +8,10 @@ const store = {
   get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
   set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} },
 };
-const API = '/api/stats';
-let key = store.get('redio-dash-key', ''), days = +store.get('redio-dash-days', 7) || 7;
+try { localStorage.removeItem('redio-dash-key'); } catch (e) {}   // older versions kept the key here
+let days = +store.get('redio-dash-days', 7) || 7;
 let dailyM = store.get('redio-dash-daily', 'visitors'), hourM = store.get('redio-dash-hour', 'listen');
-let data = null, timer = 0;
+let data = null, timer = 0, signedIn = false;
 
 const fmt = n => Math.round(n).toLocaleString('en-NG');
 const hrs = s => s >= 36000 ? fmt(s / 3600) : (s / 3600).toFixed(1).replace(/\.0$/, '');
@@ -26,22 +27,31 @@ function showLogin(msg) {
   $('dash').hidden = true; $('login').hidden = false; $('keyMsg').textContent = msg || '';
   $('key').focus();
 }
-$('keyForm').addEventListener('submit', e => {
+$('keyForm').addEventListener('submit', async e => {
   e.preventDefault();
-  key = $('key').value.trim(); $('key').value = '';
-  store.set('redio-dash-key', key);
-  load();
+  const body = JSON.stringify({ key: $('key').value.trim() });
+  $('key').value = '';
+  try {
+    const r = await fetch('/api/login', { method: 'POST', body, credentials: 'same-origin', cache: 'no-store' });
+    if (r.status === 401) return showLogin('That key didn’t work. Check it and try again.');
+    if (r.status === 429) return showLogin('Too many wrong keys from this connection. Try again in an hour.');
+    if (!r.ok) throw new Error(r.status);
+    load();
+  } catch (err) { showLogin('Couldn’t reach the stats counter. Check your connection and try again.'); }
 });
-$('logout').addEventListener('click', () => { key = ''; store.set('redio-dash-key', ''); showLogin(); });
+$('logout').addEventListener('click', async () => {
+  signedIn = false; data = null;
+  try { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); } catch (e) {}
+  showLogin('Signed out.');
+});
 
 async function load() {
   clearTimeout(timer);
-  if (!key) return showLogin();
   try {
-    const r = await fetch(`${API}?days=${days}`, { headers: { Authorization: `Bearer ${key}` }, cache: 'no-store' });
-    if (r.status === 401) { store.set('redio-dash-key', ''); key = ''; return showLogin('That key didn’t work. Check it and try again.'); }
+    const r = await fetch(`/api/stats?days=${days}`, { credentials: 'same-origin', cache: 'no-store' });
+    if (r.status === 401) { signedIn = false; data = null; return showLogin(); }
     if (!r.ok) throw new Error(r.status);
-    data = await r.json();
+    data = await r.json(); signedIn = true;
     $('login').hidden = true; $('dash').hidden = false;
     draw();
   } catch (e) {
@@ -50,7 +60,7 @@ async function load() {
   }
   timer = setTimeout(load, 20000);
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && key) load(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && signedIn) load(); });
 
 /* ---------- Toggles ---------- */
 function seg(id, attr, value, onPick) {

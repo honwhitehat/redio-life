@@ -25,6 +25,9 @@ const LIMIT = {
   perVisitor: 2000,    // events a day from one visitor
   keyTries: 20,        // wrong dashboard keys an hour, then that connection is locked out for the hour
 };
+// Dashboard sign-in: the key is only ever sent to /api/login. What the browser keeps is a random session
+// token in a cookie scripts can't read (HttpOnly), sent only over HTTPS to /api/ on this site.
+const SESSION = '__Secure-redio-dash', SESSION_SECS = 7 * 86400, MAX_SESSIONS = 20;
 const UUID4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const CUSTOM = 'custom', UNLISTED = 'unlisted';
 const NAMES = { [CUSTOM]: ['Stations people added', ''], [UNLISTED]: ['Stations not in the counter’s list yet', 'Redeploy the counter'] };
@@ -42,6 +45,14 @@ function device(ua) {
   if (/bot|crawl|spider|preview|curl|wget|python|httpclient|okhttp|go-http|node-fetch|axios/i.test(ua) || !/Mozilla/.test(ua)) return 'Bot';
   return 'Computer';
 }
+
+async function sha256(text) {
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));
+  return [...h].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+const sessionCookie = req => ((req.headers.get('Cookie') || '').split(/;\s*/).find(c => c.startsWith(SESSION + '=')) || '').slice(SESSION.length + 1);
+const setCookie = (token, secs) => `${SESSION}=${token}; Path=/api/; Max-Age=${secs}; HttpOnly; Secure; SameSite=Strict`;
+const newToken = () => [...crypto.getRandomValues(new Uint8Array(32))].map(b => b.toString(16).padStart(2, '0')).join('');
 
 async function hash(...parts) {
   const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(parts.join('|'))));
@@ -71,9 +82,13 @@ export default {
     if (!env.SALT || env.SALT.length < 16) return reply({ error: 'Counter not set up' }, 503);
     const iph = await hash(env.SALT, day, ip);
 
+    const origins = (env.ORIGINS || '').split(',').map(s => s.trim());
+    const fromSite = origins.includes(req.headers.get('Origin'));
+    // Tied to the current key, so changing DASH_KEY signs every device out
+    const keyver = env.DASH_KEY ? (await sha256('keyver|' + env.DASH_KEY)).slice(0, 24) : '';
+
     if (url.pathname === '/api/hit' && req.method === 'POST') {
-      const origins = (env.ORIGINS || '').split(',').map(s => s.trim());
-      if (!origins.includes(req.headers.get('Origin'))) return reply(null, 403);
+      if (!fromSite) return reply(null, 403);
       const size = +req.headers.get('Content-Length');   // the app always sends one; this stops huge or endless bodies
       if (!size || size > 512) return reply(null, 413);
       let b;
@@ -105,11 +120,31 @@ export default {
       return res;
     }
 
-    if (url.pathname === '/api/stats' && req.method === 'GET') {
-      const key = (req.headers.get('Authorization') || '').replace(/^Bearer /, '');
+    if (url.pathname === '/api/login' && req.method === 'POST') {
+      if (!fromSite) return reply(null, 403);
+      const size = +req.headers.get('Content-Length');
+      if (!size || size > 512) return reply(null, 413);
+      let key = '';
+      try { key = String(JSON.parse(await req.text()).key || ''); } catch (e) { return reply(null, 400); }
       const ok = !!env.DASH_KEY && same(key, env.DASH_KEY);
       if (!(await stats.login(iph, ok, t))) return reply({ error: 'Too many wrong keys. Try again in an hour.' }, 429);
       if (!ok) return reply({ error: 'Wrong dashboard key' }, 401);
+      const token = newToken();
+      await stats.startSession(await sha256(token), keyver, t + SESSION_SECS);
+      return new Response(null, { status: 204, headers: { 'Set-Cookie': setCookie(token, SESSION_SECS), 'Cache-Control': 'no-store' } });
+    }
+
+    if (url.pathname === '/api/logout' && req.method === 'POST') {
+      if (!fromSite) return reply(null, 403);
+      const token = sessionCookie(req);
+      if (token) await stats.endSession(await sha256(token));
+      return new Response(null, { status: 204, headers: { 'Set-Cookie': setCookie('', 0), 'Cache-Control': 'no-store' } });
+    }
+
+    if (url.pathname === '/api/stats' && req.method === 'GET') {
+      const token = sessionCookie(req);
+      if (!token || !keyver || !(await stats.checkSession(await sha256(token), keyver, t)))
+        return new Response(JSON.stringify({ error: 'Please sign in' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Set-Cookie': setCookie('', 0) } });
       const days = Math.min(KEEP_DAYS, Math.max(1, parseInt(url.searchParams.get('days'), 10) || 7));
       return reply(await stats.stats(days));
     }
@@ -123,7 +158,8 @@ export class Stats extends DurableObject {
     super(ctx, env);
     this.sql = ctx.storage.sql;
     // Version 2 added the limits. Everything before it was testing before launch, so it starts afresh.
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER);
+      CREATE TABLE IF NOT EXISTS sessions (th TEXT PRIMARY KEY, keyver TEXT, until INTEGER);`);
     if ((this.q(`SELECT v FROM meta WHERE k = 'version'`)[0] || { v: 1 }).v < 2) {
       this.sql.exec(`DROP TABLE IF EXISTS live; DROP TABLE IF EXISTS counts; DROP TABLE IF EXISTS visitors; DROP TABLE IF EXISTS stations;
         CREATE TABLE live (sid TEXT PRIMARY KEY, iph TEXT, station TEXT, started INTEGER, seen INTEGER);
@@ -172,6 +208,18 @@ export class Stats extends DurableObject {
     this.sql.exec(`DELETE FROM counts WHERE day < ?`, dayOf(t - KEEP_DAYS * 86400));
     this.sql.exec(`DELETE FROM visitors WHERE day < ?`, dayOf(t - 86400));
     this.sql.exec(`DELETE FROM limits WHERE until < ?`, t);
+    this.sql.exec(`DELETE FROM sessions WHERE until < ?`, t);
+  }
+
+  // Dashboard sessions are kept as a hash of the token, so the database alone can't sign anyone in
+  async startSession(th, keyver, until) {
+    this.sql.exec(`INSERT INTO sessions VALUES (?, ?, ?)`, th, keyver, until);
+    this.sql.exec(`DELETE FROM sessions WHERE th NOT IN (SELECT th FROM sessions ORDER BY until DESC LIMIT ?)`, MAX_SESSIONS);
+  }
+  async endSession(th) { this.sql.exec(`DELETE FROM sessions WHERE th = ?`, th); }
+  async checkSession(th, keyver, t) {
+    const row = this.q(`SELECT * FROM sessions WHERE th = ?`, th)[0];
+    return !!row && row.keyver === keyver && row.until > t;
   }
 
   async login(iph, ok, t) {
