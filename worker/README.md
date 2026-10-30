@@ -27,7 +27,7 @@ Daily numbers are kept for 400 days.
 ## Privacy
 
 - Each time the app opens it makes a random UUID v4 for that visit, kept in memory only.
-- No cookies. The only thing saved on the listener's phone is a yes/no that it has been counted as a
+- No cookies for listeners. The only thing saved on the listener's phone is a yes/no that it has been counted as a
   user, so "users all time" counts each phone once. Clearing the app's data or using a new phone counts again.
 - No IP addresses are stored. A visitor is told apart for one day only, by a hash of their IP
   address, browser and that day's date mixed with a secret (`SALT`). Nobody can be followed from
@@ -84,6 +84,17 @@ npx wrangler secret put SALT
 
 `DASH_KEY` is what you type to open the dashboard. `SALT` is never typed anywhere; it only mixes
 up the daily visitor hashes.
+
+### Signing in to the dashboard
+
+The key is sent once, to `/api/login`, and is never saved in the browser. The counter answers with a
+random 7-day session in a cookie the page's scripts can't read (`HttpOnly`), sent only over HTTPS to
+`/api/` on this site (`Secure`, `SameSite=Strict`). The counter keeps only a hash of it.
+
+- **Sign out** on the dashboard ends that session on the counter straight away.
+- **Changing `DASH_KEY`** (`npx wrangler secret put DASH_KEY`) signs every device out at once. Do this
+  if you think the key has been seen by anyone else.
+- At most 20 sessions are kept; signing in a 21st time drops the oldest.
 
 Then deploy (this also builds the station list from `stations.js`):
 
