@@ -22,13 +22,26 @@
   --wall:#6E8E89; --wall-shade:#557570;
   --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
   --ink:#2C1B0F; --brass:#D2AA62; --brass-dark:#7A5A26;
-  --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B; --label:#EED9A8;
+  --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B; --label:#EED9A8; --brass-hi:#F3DCA4;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 }
 :root[data-theme="dark"]{ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 /* Colour themes, picked under the radio (theme.js). Each recolours the wall, the cabinet, the brass and the labels. */
+:root[data-theme="hacker"]{ --wall:#050A05; --wall-shade:#000000; --walnut-light:#0F2A12; --walnut:#0A1A0C; --walnut-dark:#000000;
+  --brass:#00FF41; --brass-dark:#00802B; --brass-hi:#B3FFC6; --amber:#39FF88; --glow:#CCFFD8; --label:#9CFFB4; --hint:#7CFF9E; --eye:#00FF41; }
+:root[data-theme="hacker"] .now-name, :root[data-theme="hacker"] .now-line, :root[data-theme="hacker"] .find{font-family:"Courier New",Courier,monospace;letter-spacing:-.02em}
+:root[data-theme="hacker"] .face{background:#031203;box-shadow:inset 0 3px 10px #000,inset 0 0 0 1px #0A3A12}
+:root[data-theme="hacker"] .radio[data-on="true"] .face{background:radial-gradient(ellipse at 50% 65%,#0C3A14,#031203);box-shadow:inset 0 3px 10px #000,inset 0 0 30px rgba(0,255,65,.25)}
+:root[data-theme="hacker"] .now{color:#7CFF9E;text-shadow:0 0 6px rgba(0,255,65,.45)}
+:root[data-theme="hacker"] .badge{color:#00C832}
+/* Easy to read: the clean blue and white of the big social sites */
+:root[data-theme="blue"]{ --wall:#F0F2F5; --wall-shade:#DCE3EC; --walnut-light:#246CCF; --walnut:#1A5FC0; --walnut-dark:#0B3A75;
+  --brass:#CFE3FF; --brass-dark:#3D6FB8; --brass-hi:#FFFFFF; --amber:#BFDCFF; --glow:#FFFFFF; --label:#F2F7FF; --hint:#1C2B39; }
+/* Purple and pink like a photo app, with a short-video app's cyan */
+:root[data-theme="social"]{ --wall:#0B0B10; --wall-shade:#050507; --walnut-light:#833AB4; --walnut:#B0307F; --walnut-dark:#14081A;
+  --brass:#25F4EE; --brass-dark:#0E8E8A; --brass-hi:#C8FFFD; --amber:#FF8FB0; --glow:#FFFFFF; --label:#FFEAF4; --hint:#E8D9F2; }
 :root[data-theme="midnight"]{ --wall:#141B33; --wall-shade:#0B1020; --walnut-light:#24305A; --walnut:#161E36; --walnut-dark:#0B1020;
   --brass:#8AA4FF; --brass-dark:#3B4C8F; --amber:#B4C4FF; --glow:#E8ECFF; --label:#D4DCFF; --hint:#C9D2F5; }
 :root[data-theme="green"]{ --wall:#0E2418; --wall-shade:#06170E; --walnut-light:#1C4A30; --walnut:#0E2A1A; --walnut-dark:#06170E;
@@ -96,7 +109,7 @@ body{
 .knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--label);font-size:14px}
 .knob{
   position:relative;width:62px;height:62px;border-radius:50%;cursor:grab;touch-action:none;
-  background:radial-gradient(circle at 35% 30%,#F3DCA4,var(--brass) 45%,var(--brass-dark));
+  background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 45%,var(--brass-dark));
   box-shadow:0 5px 9px rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.35);
 }
 .knob:active{cursor:grabbing}
@@ -211,7 +224,7 @@ details.more .grid{margin-top:8px}
   font:600 17px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--amber);background:var(--walnut-dark);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
 }
-.tab[aria-selected="true"]{color:var(--ink);background:linear-gradient(180deg,#F3DCA4,var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
+.tab[aria-selected="true"]{color:var(--ink);background:linear-gradient(180deg,var(--brass-hi),var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
 .region-title{margin:24px 2px 0;font:400 22px Limelight,Georgia,serif;color:var(--brass);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .region-title small{font:500 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--label);opacity:.75}
 .state-title{margin:12px 2px 6px;font-size:17px;font-weight:600;color:var(--label);opacity:.9}

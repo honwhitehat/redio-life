@@ -486,10 +486,10 @@ findStreams();
 {
   const pick = $('themePick'), dark = matchMedia('(prefers-color-scheme: dark)');
   THEMES.forEach(([k, label]) => pick.appendChild(new Option(label, k)));
-  pick.value = store.get('redio-theme', 'auto');
-  if (!pick.value) pick.value = 'auto';
+  pick.value = store.get('redio-theme', 'classic');
+  if (!pick.value) pick.value = 'classic';
   pick.addEventListener('change', () => { store.set('redio-theme', pick.value); applyTheme(pick.value); });
-  dark.addEventListener('change', () => applyTheme(pick.value));   // keeps the phone-bar colour right in "Match my phone"
+  dark.addEventListener('change', () => applyTheme(pick.value));   // "Match my phone" switches as the phone does
 }
 /* Updates: check whenever the app comes back to the front, and switch to a new version once the radio is off */
 let updateReady = false;

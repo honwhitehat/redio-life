@@ -7,7 +7,7 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front. *R
 - **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
 - **Across Nigeria:** 252 stations from 27 states, grouped by region and state
 - Favourites, search by name, town, state or frequency, previous/next, and scan
-- Nine colour themes, from the classic walnut radio to Afrobeat Teal and Soft Sand, picked under the radio
+- 13 colour themes under the radio: the classic walnut radio, Match my phone, Hacker Green, an easy-to-read Classic Blue, Social Glow and more
 - Add your own station, or paste a stream link for one, saved on your phone
 - Works as an installable web app, and as an Android app that wraps this site
 
