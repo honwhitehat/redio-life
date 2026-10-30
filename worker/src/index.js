@@ -290,7 +290,8 @@ export class Stats extends DurableObject {
       const since = ok ? 0 : (row && row.fails ? row.since : t);
       this.sql.exec(`INSERT OR REPLACE INTO streams VALUES (?, ?, ?, ?, ?)`, id, t, fails, since, detail);
     }
-    this.sql.exec(`DELETE FROM streams WHERE id NOT IN (${Object.keys(STATIONS).map(() => '?').join(',')})`, ...Object.keys(STATIONS));
+    // Stations taken out of stations.js (one at a time: Cloudflare allows 100 values per query)
+    for (const { id } of this.q(`SELECT id FROM streams`)) if (!Object.hasOwn(STATIONS, id)) this.sql.exec(`DELETE FROM streams WHERE id = ?`, id);
   }
   streamReport() {
     const withLinks = Object.keys(STATIONS).filter(id => STATIONS[id][2].length);
