@@ -178,8 +178,7 @@ const visitId = Math.random().toString(36).slice(2) + Date.now().toString(36);
 let counted = null, countTimer = 0, beatTimer = 0;
 function hit(t, s, more, beacon) {
   if (!STATS_URL) return;
-  const who = !s ? {} : s.custom ? { id: 'custom', name: 'Stations people added', where: '' } : { id: s.id, name: s.name, where: place(s) };
-  const body = JSON.stringify({ t, sid: visitId, ...who, ...more });
+  const body = JSON.stringify({ t, sid: visitId, ...(s && { id: s.custom ? 'custom' : s.id }), ...more });
   try {
     if (beacon && navigator.sendBeacon) navigator.sendBeacon(STATS_URL, body);
     else fetch(STATS_URL, { method: 'POST', body, keepalive: true, credentials: 'omit' }).catch(() => {});

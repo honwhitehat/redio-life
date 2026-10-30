@@ -31,6 +31,31 @@ Daily numbers are kept for 400 days.
   one day to the next, so "Visitors" over 7 or 30 days is the daily visitors added up.
 - Stations people add themselves are counted together as "Stations people added", without their names.
 
+## Protection against fake numbers
+
+Anyone can send requests to a public counter, so it only trusts so much from each connection
+(IP address). The limits are generous, because Nigerian mobile networks put many phones behind
+one address:
+
+| Limit | Per connection | What a real listener uses |
+|---|---|---|
+| Events | 60 a minute | about 1 a minute |
+| Listening at once | 25 | 1 |
+| New visitors | 300 a day | 1 |
+| Wrong dashboard keys | 20 an hour, then locked out for the rest of the hour | 0 |
+
+Past a limit, extra events are quietly dropped and the radio carries on as normal. On top of that:
+
+- Only stations in `stations.js` are counted, and the counter uses its own names for them, so nobody
+  can put made-up names on your dashboard. Anything else shows as "Stations not in the counter's
+  list yet". **After changing `stations.js`, redeploy the counter** (`npx wrangler deploy`) so new
+  stations are counted under their names.
+- Requests from scripts and bots (curl, Python and similar) and from other websites are ignored.
+- "How people found Redio Life" only accepts real website names.
+
+Someone with many IP addresses could still add some fake numbers. That takes real effort, and each
+address can only add a little.
+
 ## Putting it live (one time)
 
 You need Node.js and a Cloudflare account that has `cybergistplanet.com` on it.
@@ -54,7 +79,7 @@ npx wrangler secret put SALT
 `DASH_KEY` is what you type to open the dashboard. `SALT` is never typed anywhere; it only mixes
 up the daily visitor hashes.
 
-Then deploy:
+Then deploy (this also builds the station list from `stations.js`):
 
 ```bash
 npx wrangler deploy
