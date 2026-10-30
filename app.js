@@ -150,6 +150,7 @@ function saveLive() { store.set('starlite-live', { id: sel ? sel.id : null, v: v
 const playable = s => s.urls.length > 0;
 
 function connect(s) {
+  if (s !== counted) stopCount();
   current = s;
   if (!s) { player.pause(); player.removeAttribute('src'); player.load(); status = ''; update(); return; }
   status = 'connecting';
@@ -159,14 +160,51 @@ function connect(s) {
   setMediaSession(s);
   update();
 }
-player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); } });
+player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); startCount(current); } });
 player.addEventListener('waiting', () => { if (current) { status = 'buffering'; update(); } });
 player.addEventListener('error', () => {
   if (!current || !player.getAttribute('src')) return;
   const s = current; s.ui++;
   if (s.ui < s.urls.length) connect(s);            // try the next link for this station
-  else { s.dead = true; status = 'unavailable'; update(); }
+  else { s.dead = true; status = 'unavailable'; update(); stopCount(); hit('fail', s); }
 });
+
+/* ---------- Listener counts for the dashboard (dashboard.html, counted by worker/) ----------
+   A station counts as played once it has been on for 15 seconds, so Scan's 12-second stops don't count,
+   and then the app checks in every minute while it plays. No cookies and nothing is saved on the phone:
+   the id below is made fresh each time the app opens. */
+const STATS_URL = location.hostname === 'radio.cybergistplanet.com' ? '/api/hit' : '';
+const visitId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+let counted = null, countTimer = 0, beatTimer = 0;
+function hit(t, s, more, beacon) {
+  if (!STATS_URL) return;
+  const who = !s ? {} : s.custom ? { id: 'custom', name: 'Stations people added', where: '' } : { id: s.id, name: s.name, where: place(s) };
+  const body = JSON.stringify({ t, sid: visitId, ...who, ...more });
+  try {
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon(STATS_URL, body);
+    else fetch(STATS_URL, { method: 'POST', body, keepalive: true, credentials: 'omit' }).catch(() => {});
+  } catch (e) {}
+}
+function startCount(s) {
+  if (counted === s || countTimer) return;
+  countTimer = setTimeout(() => {
+    countTimer = 0;
+    if (current !== s || !on) return;
+    counted = s; hit('play', s);
+    beatTimer = setInterval(() => hit('beat', s), 60000);
+  }, 15000);
+}
+function stopCount(beacon) {
+  clearTimeout(countTimer); countTimer = 0;
+  if (!counted) return;
+  clearInterval(beatTimer); hit('stop', counted, {}, beacon); counted = null;
+}
+addEventListener('pagehide', () => stopCount(true));
+{
+  let ref = '';
+  try { ref = new URL(document.referrer).hostname; } catch (e) {}
+  hit('visit', null, { ref: ref === location.hostname ? '' : ref });
+}
 
 function play(s) {
   if (!s) return;

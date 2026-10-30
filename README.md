@@ -14,6 +14,10 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front. *R
 
 Redio Life plays each station's own public online stream, straight from that station's streaming server. It doesn't record, copy or re-host any audio. The station list and its stream links are in [`stations.js`](stations.js).
 
+## Listener counts
+
+To know how many people listen, the app tells a small counter which station is on, once it has played for 15 seconds and then once a minute while it plays. There are no cookies, nothing is saved on your phone, and no IP addresses are kept. Visitors are told apart for one day only and can't be followed from day to day. See [`worker/README.md`](worker/README.md) for exactly what's counted.
+
 ## Disclaimer
 
 Redio Life isn't affiliated with any of the stations it lists. All programmes, streams, station names and trademarks belong to their owners.
