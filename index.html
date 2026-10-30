@@ -22,12 +22,43 @@
   --wall:#6E8E89; --wall-shade:#557570;
   --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
   --ink:#2C1B0F; --brass:#D2AA62; --brass-dark:#7A5A26;
-  --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B;
+  --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B; --label:#EED9A8; --brass-hi:#F3DCA4;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 }
 :root[data-theme="dark"]{ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
+/* Colour themes, picked under the radio (theme.js). Each recolours the wall, the cabinet, the brass and the labels. */
+:root[data-theme="hacker"]{ --wall:#050A05; --wall-shade:#000000; --walnut-light:#0F2A12; --walnut:#0A1A0C; --walnut-dark:#000000;
+  --brass:#00FF41; --brass-dark:#00802B; --brass-hi:#B3FFC6; --amber:#39FF88; --glow:#CCFFD8; --label:#9CFFB4; --hint:#7CFF9E; --eye:#00FF41; }
+:root[data-theme="hacker"] .now-name, :root[data-theme="hacker"] .now-line, :root[data-theme="hacker"] .find{font-family:"Courier New",Courier,monospace;letter-spacing:-.02em}
+:root[data-theme="hacker"] .face{background:#031203;box-shadow:inset 0 3px 10px #000,inset 0 0 0 1px #0A3A12}
+:root[data-theme="hacker"] .radio[data-on="true"] .face{background:radial-gradient(ellipse at 50% 65%,#0C3A14,#031203);box-shadow:inset 0 3px 10px #000,inset 0 0 30px rgba(0,255,65,.25)}
+:root[data-theme="hacker"] .now{color:#7CFF9E;text-shadow:0 0 6px rgba(0,255,65,.45)}
+:root[data-theme="hacker"] .badge{color:#00C832}
+/* Easy to read: the clean blue and white of the big social sites */
+:root[data-theme="blue"]{ --wall:#F0F2F5; --wall-shade:#DCE3EC; --walnut-light:#246CCF; --walnut:#1A5FC0; --walnut-dark:#0B3A75;
+  --brass:#CFE3FF; --brass-dark:#3D6FB8; --brass-hi:#FFFFFF; --amber:#BFDCFF; --glow:#FFFFFF; --label:#F2F7FF; --hint:#1C2B39; }
+/* Purple and pink like a photo app, with a short-video app's cyan */
+:root[data-theme="social"]{ --wall:#0B0B10; --wall-shade:#050507; --walnut-light:#833AB4; --walnut:#B0307F; --walnut-dark:#14081A;
+  --brass:#25F4EE; --brass-dark:#0E8E8A; --brass-hi:#C8FFFD; --amber:#FF8FB0; --glow:#FFFFFF; --label:#FFEAF4; --hint:#E8D9F2; }
+:root[data-theme="midnight"]{ --wall:#141B33; --wall-shade:#0B1020; --walnut-light:#24305A; --walnut:#161E36; --walnut-dark:#0B1020;
+  --brass:#8AA4FF; --brass-dark:#3B4C8F; --amber:#B4C4FF; --glow:#E8ECFF; --label:#D4DCFF; --hint:#C9D2F5; }
+:root[data-theme="green"]{ --wall:#0E2418; --wall-shade:#06170E; --walnut-light:#1C4A30; --walnut:#0E2A1A; --walnut-dark:#06170E;
+  --brass:#2FBF71; --brass-dark:#146B3D; --amber:#7CDFA6; --glow:#E8F8EE; --label:#CDEFDB; --hint:#BFE6CF; }
+:root[data-theme="sunset"]{ --wall:#2A1420; --wall-shade:#1C0E14; --walnut-light:#4A2434; --walnut:#2E1620; --walnut-dark:#1C0E14;
+  --brass:#FB923C; --brass-dark:#9A4A12; --amber:#FDBA74; --glow:#FFF1E6; --label:#FFDCC2; --hint:#F5D5C0; }
+:root[data-theme="teal"]{ --wall:#0D2629; --wall-shade:#071A1C; --walnut-light:#1A4246; --walnut:#0F2A2D; --walnut-dark:#071A1C;
+  --brass:#14B8A6; --brass-dark:#0B6B61; --amber:#5EEAD4; --glow:#E6FAF8; --label:#C5F1EC; --hint:#B8E6E1; }
+:root[data-theme="ember"]{ --wall:#261111; --wall-shade:#1A0B0B; --walnut-light:#4A2222; --walnut:#2A1414; --walnut-dark:#1A0B0B;
+  --brass:#F2606B; --brass-dark:#8C1C25; --amber:#FF8A93; --glow:#FDECEC; --label:#F8CFCF; --hint:#EFC4C4; }
+:root[data-theme="lime"]{ --wall:#18200D; --wall-shade:#0F1408; --walnut-light:#2E3D1C; --walnut:#1B2410; --walnut-dark:#0F1408;
+  --brass:#A3E635; --brass-dark:#557A16; --amber:#C8F27A; --glow:#F3FBE6; --label:#DDEFC4; --hint:#D2E6B5; }
+/* Light rooms: the wall goes light, the radio stays a wood or slate that carries light labels */
+:root[data-theme="sand"]{ --wall:#FAF6F0; --wall-shade:#EFE6D8; --walnut-light:#8C5C2E; --walnut:#7E5228; --walnut-dark:#3F2812;
+  --brass:#F5B544; --brass-dark:#9A5205; --amber:#FCD08A; --glow:#FFF4E0; --label:#FFF0D9; --hint:#292018; }
+:root[data-theme="light"]{ --wall:#F7F7F5; --wall-shade:#E4E4DF; --walnut-light:#5E6872; --walnut:#454E58; --walnut-dark:#22282E;
+  --brass:#93C5FD; --brass-dark:#1E40AF; --amber:#BFDBFE; --glow:#F1F5F9; --label:#E2E8F0; --hint:#1F2937; }
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%}
 body{
@@ -43,6 +74,11 @@ body{
     linear-gradient(180deg,var(--walnut-light),var(--walnut) 40%,var(--walnut-dark));
   box-shadow:inset 0 2px 0 rgba(255,255,255,.18), inset 0 -6px 12px rgba(0,0,0,.35), 0 30px 60px rgba(0,0,0,.35);
 }
+/* Listening now / users all time, a brass plate under the dial */
+.counts{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 22px;margin:10px 0 0;color:var(--label);font-size:17px;letter-spacing:.3px;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+.counts[hidden]{display:none}
+.counts b{font-weight:600;color:var(--glow);font-variant-numeric:tabular-nums;margin-right:4px}
+.counts .live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--eye);box-shadow:0 0 8px var(--eye)}
 /* Now-playing panel */
 .frame{padding:9px;border-radius:14px;background:linear-gradient(180deg,#EBCB86,var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
 .face{
@@ -70,10 +106,10 @@ body{
 .now-line{font-size:17px;line-height:1.2;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Controls */
 .controls{display:flex;align-items:center;gap:14px;margin-top:16px}
-.knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;color:#EED9A8;font-size:14px}
+.knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--label);font-size:14px}
 .knob{
   position:relative;width:62px;height:62px;border-radius:50%;cursor:grab;touch-action:none;
-  background:radial-gradient(circle at 35% 30%,#F3DCA4,var(--brass) 45%,var(--brass-dark));
+  background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 45%,var(--brass-dark));
   box-shadow:0 5px 9px rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.35);
 }
 .knob:active{cursor:grabbing}
@@ -101,7 +137,7 @@ body{
 }
 .find::placeholder{color:rgba(243,220,155,.45)}
 .tools .key{flex:0 0 auto;padding:0 14px;height:44px}
-.group-title{margin:18px 2px 8px;font-size:18px;font-weight:600;color:#EED9A8;display:flex;justify-content:space-between;gap:8px}
+.group-title{margin:18px 2px 8px;font-size:18px;font-weight:600;color:var(--label);display:flex;justify-content:space-between;gap:8px}
 .group-title small{font-weight:500;opacity:.7;font-size:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .tile{position:relative}
@@ -130,10 +166,13 @@ body{
 .eq i:nth-child(2){animation-delay:-.4s}.eq i:nth-child(3){animation-delay:-.7s}
 @keyframes eq{0%,100%{height:4px}50%{height:14px}}
 details.more{margin-top:18px}
-details.more summary{cursor:pointer;color:#EED9A8;font-size:18px;font-weight:600;padding:4px 2px}
+details.more summary{cursor:pointer;color:var(--label);font-size:18px;font-weight:600;padding:4px 2px}
 details.more .grid{margin-top:8px}
-.empty{grid-column:1/-1;margin:0;color:#EED9A8;opacity:.8;font-size:17px}
-.hint{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+.empty{grid-column:1/-1;margin:0;color:var(--label);opacity:.8;font-size:17px}
+.about{max-width:46ch;margin:0;text-align:center;color:var(--hint);font-size:17px;line-height:1.35}
+.about h2{margin:18px 0 4px;font:400 20px Limelight,Georgia,serif;letter-spacing:.02em}
+.about h2:first-child{margin-top:0}
+.about p{margin:0}
 .toast{
   position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);
   max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:var(--glow);
@@ -188,12 +227,16 @@ details.more .grid{margin-top:8px}
   font:600 17px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--amber);background:var(--walnut-dark);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
 }
-.tab[aria-selected="true"]{color:var(--ink);background:linear-gradient(180deg,#F3DCA4,var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
+.tab[aria-selected="true"]{color:var(--ink);background:linear-gradient(180deg,var(--brass-hi),var(--brass) 55%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.45)}
 .region-title{margin:24px 2px 0;font:400 22px Limelight,Georgia,serif;color:var(--brass);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.region-title small{font:500 16px "Barlow Condensed","Arial Narrow",sans-serif;color:#EED9A8;opacity:.75}
-.state-title{margin:12px 2px 6px;font-size:17px;font-weight:600;color:#EED9A8;opacity:.9}
+.region-title small{font:500 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--label);opacity:.75}
+.state-title{margin:12px 2px 6px;font-size:17px;font-weight:600;color:var(--label);opacity:.9}
 .tile .play b.word{font-size:17px}
+.theme-pick{display:flex;align-items:center;gap:10px;color:var(--hint);font-size:17px}
+.theme-pick select{font:600 17px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--glow);background:var(--walnut-dark);
+  border:2px solid var(--brass-dark);border-radius:10px;padding:6px 10px;cursor:pointer}
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <main class="room">
@@ -208,6 +251,10 @@ details.more .grid{margin-top:8px}
         </div>
       </div>
     </div>
+    <p class="counts" id="counts" hidden>
+      <span><i class="live-dot" aria-hidden="true"></i><b id="liveCount">0</b> listening now</span>
+      <span><b id="userCount">0</b> users all time</span>
+    </p>
     <div class="controls">
       <div class="knob-wrap">
         <div class="knob" id="volKnob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100"><div class="cap"></div><div class="mark"></div></div>
@@ -258,7 +305,15 @@ details.more .grid{margin-top:8px}
       </div>
     </form>
   </dialog>
-  <p class="hint">Tap a station to play it, and tap it again to switch off. Tap ☆ to keep it in Favourites at the top. Lagos corner has Lagos stations; Across Nigeria has the rest, by region and state. ◀ and ▶ go to the previous or next station, and Scan plays each one for 12 seconds. Tap + Add to add a Lagos station you know or paste a stream link.</p>
+  <label class="theme-pick">Colour <select id="themePick"></select></label>
+  <section class="about">
+    <h2>How to use Redio Life</h2>
+    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
+    <h2>Uses data</h2>
+    <p>Stations stream over the internet, so they use your data or Wi‑Fi.</p>
+    <h2>Disclaimer</h2>
+    <p>Redio Life links to streams provided by the stations. We don’t own or control any station, its content, or its availability. Names and logos belong to their owners. The app is provided as is, and we’re not responsible for data charges or interrupted streams.</p>
+  </section>
 </main>
 
 <script src="stations.js"></script>

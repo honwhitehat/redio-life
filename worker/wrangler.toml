@@ -1,0 +1,22 @@
+# Redio Life stats counter. See worker/README.md for how to put it live.
+name = "redio-life-stats"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = false
+
+routes = [{ pattern = "radio.cybergistplanet.com/api/*", zone_name = "cybergistplanet.com" }]
+
+[vars]
+ORIGINS = "https://radio.cybergistplanet.com"
+
+[[durable_objects.bindings]]
+name = "STATS"
+class_name = "Stats"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Stats"]
+
+# Makes src/stations.json from ../stations.js, so only real stations are counted
+[build]
+command = "node build-stations.mjs"

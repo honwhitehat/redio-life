@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Redio Life Dashboard</title>
+<meta name="theme-color" content="#3B2414">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wall:#6E8E89; --wall-shade:#557570;
+  --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
+  --panel:#F4EEDF; --panel-line:#D9CDB2; --ink:#2C1B0F; --ink-soft:#6B5741;
+  --brass:#B8873A; --brass-light:#D2AA62; --bar:#9A6A2A; --bar-soft:#E2D2AE;
+  --eye:#2FB862; --down:#B4442E; --hint:#F4EEDF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --wall:#1F2C2A; --wall-shade:#141D1C; --panel:#2A1D13; --panel-line:#4A3522; --ink:#F1E6CF; --ink-soft:#BFAE90;
+    --bar:#D9B06A; --bar-soft:#4A3522; --eye:#5DF08C; --down:#E7765C; --hint:#CFC6B2;
+  }
+}
+:root[data-theme="dark"]{
+  --wall:#1F2C2A; --wall-shade:#141D1C; --panel:#2A1D13; --panel-line:#4A3522; --ink:#F1E6CF; --ink-soft:#BFAE90;
+  --bar:#D9B06A; --bar-soft:#4A3522; --eye:#5DF08C; --down:#E7765C; --hint:#CFC6B2;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,var(--wall),var(--wall-shade));color:var(--ink);
+  font:500 17px/1.35 "Barlow Condensed",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:16px}
+h1{font:400 clamp(28px,6vw,40px)/1 Limelight,serif;color:var(--hint);margin:0;letter-spacing:.5px;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+h1 small{display:block;font:600 15px "Barlow Condensed",sans-serif;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-top:4px}
+.spacer{flex:1}
+.seg{display:inline-flex;background:var(--walnut-dark);border-radius:999px;padding:3px;gap:2px}
+.seg button{all:unset;cursor:pointer;color:var(--hint);padding:6px 14px;border-radius:999px;font-weight:600;letter-spacing:.5px}
+.seg button[aria-pressed="true"]{background:var(--brass-light);color:var(--walnut-dark)}
+.seg button:focus-visible,.link:focus-visible{outline:2px solid var(--brass-light);outline-offset:2px}
+.link{all:unset;cursor:pointer;color:var(--hint);text-decoration:underline;opacity:.85}
+.cabinet{background:linear-gradient(180deg,var(--walnut-light),var(--walnut) 30%,var(--walnut-dark));border-radius:22px;padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15)}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--panel);border-radius:14px;padding:14px 16px;border:1px solid var(--panel-line);min-width:0}
+.card h2{font:600 14px "Barlow Condensed",sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card h2 .seg{margin-left:auto;background:var(--bar-soft)} .card h2 .seg button{color:var(--ink);padding:3px 10px;font-size:14px;letter-spacing:.5px;text-transform:none}
+.card h2 .seg button[aria-pressed="true"]{background:var(--bar);color:var(--panel)}
+.num{font:400 clamp(30px,5vw,42px)/1 Limelight,serif;font-variant-numeric:tabular-nums}
+.sub{color:var(--ink-soft);font-size:15px;margin-top:6px}
+.live .num{display:flex;align-items:center;gap:12px}
+.eye{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#b9ffd0,var(--eye) 45%,#0d4d26);box-shadow:0 0 12px var(--eye);flex:none}
+.eye.idle{background:radial-gradient(circle at 40% 35%,#9aa,#456 60%,#123);box-shadow:none}
+@media (prefers-reduced-motion:no-preference){.eye:not(.idle){animation:pulse 2.4s ease-in-out infinite}}
+@keyframes pulse{50%{box-shadow:0 0 4px var(--eye)}}
+.chart{position:relative}
+.chart svg{display:block;overflow:visible}
+.chart .axis{fill:var(--ink-soft);font:500 12px "Barlow Condensed",sans-serif}
+.chart .gridline{stroke:var(--panel-line);stroke-width:1}
+.chart .b{fill:var(--bar)} .chart .hit{fill:transparent;cursor:default}
+.chart .hit:hover+.b,.chart g:hover .b{fill:var(--brass-light)}
+.tip{position:absolute;pointer-events:none;background:var(--walnut-dark);color:#F4EEDF;padding:6px 10px;border-radius:8px;font-size:15px;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .1s}
+.tip.show{opacity:1}
+table{width:100%;border-collapse:collapse;font-size:16px}
+td,th{padding:5px 4px;text-align:left;vertical-align:middle} th{font-weight:600;color:var(--ink-soft);font-size:14px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;width:1%}
+td.name{width:45%;overflow-wrap:anywhere} td.name small{display:block;color:var(--ink-soft);font-size:13px}
+.meter{height:10px;background:var(--bar-soft);border-radius:999px;overflow:hidden;min-width:40px}
+.meter i{display:block;height:100%;background:var(--bar);border-radius:999px}
+.empty{color:var(--ink-soft);font-style:italic;margin:6px 0}
+.down{color:var(--down);font-weight:600}
+details{margin-top:8px;color:var(--ink-soft)} summary{cursor:pointer}
+.login{max-width:420px;margin:12vh auto 0;text-align:center}
+.login form{display:flex;gap:8px;margin-top:14px}
+.login input{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--panel-line);background:var(--panel);color:var(--ink)}
+.login button{font:inherit;font-weight:600;padding:10px 16px;border:0;border-radius:10px;background:var(--brass-light);color:var(--walnut-dark);cursor:pointer}
+.msg{color:var(--down);min-height:1.4em;margin:8px 0 0}
+footer{color:var(--hint);opacity:.8;font-size:15px;margin-top:16px;text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<main>
+  <section class="login cabinet" id="login" hidden>
+    <div class="card">
+      <h1 style="color:var(--ink);text-shadow:none">Redio Life<small>Listener dashboard</small></h1>
+      <p class="sub">Type the dashboard key to see the numbers.</p>
+      <form id="keyForm">
+        <label class="sr" for="key">Dashboard key</label>
+        <input id="key" type="password" autocomplete="current-password" required>
+        <button type="submit">Open</button>
+      </form>
+      <p class="msg" id="keyMsg" role="alert"></p>
+    </div>
+  </section>
+
+  <div id="dash" hidden>
+    <header>
+      <h1>Redio Life<small>Listener dashboard</small></h1>
+      <span class="spacer"></span>
+      <div class="seg" role="group" aria-label="Time range" id="range">
+        <button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30">30 days</button><button data-days="90">90 days</button>
+      </div>
+    </header>
+
+    <div class="cabinet grid">
+      <div class="grid kpis">
+        <div class="card live"><h2>Listening now</h2><div class="num"><span class="eye idle" id="eye"></span><span id="liveN">0</span></div><div class="sub" id="peak"></div></div>
+        <div class="card"><h2 id="visitorsLabel">Visitors</h2><div class="num" id="visitors">0</div><div class="sub" id="visits"></div></div>
+        <div class="card"><h2>Plays</h2><div class="num" id="plays">0</div><div class="sub" id="playsAll"></div></div>
+        <div class="card"><h2>Hours listened</h2><div class="num" id="hours">0</div><div class="sub" id="hoursAll"></div></div>
+      </div>
+
+      <div class="card">
+        <h2>Day by day
+          <span class="seg" role="group" aria-label="Measure" id="dailyPick">
+            <button data-m="visitors">Visitors</button><button data-m="plays">Plays</button><button data-m="listen">Hours</button><button data-m="peak">Peak listeners</button>
+          </span>
+        </h2>
+        <div class="chart" id="daily"></div>
+        <details><summary>Show as a table</summary><div id="dailyTable"></div></details>
+      </div>
+
+      <div class="grid two">
+        <div class="card"><h2>On air right now</h2><div id="liveList"></div></div>
+        <div class="card">
+          <h2>Busiest hours <small style="text-transform:none;letter-spacing:0">(Lagos time)</small>
+            <span class="seg" role="group" aria-label="Measure" id="hourPick"><button data-m="listen">Listening</button><button data-m="plays">Plays</button></span>
+          </h2>
+          <div class="chart" id="hoursChart"></div>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="card"><h2>Top stations by plays</h2><div id="topPlays"></div></div>
+        <div class="card"><h2>Top stations by time listened</h2><div id="topListen"></div></div>
+      </div>
+
+      <div class="grid two">
+        <div class="card"><h2>Where listeners are (Nigerian states)</h2><div id="states"></div></div>
+        <div class="card"><h2>Countries</h2><div id="countries"></div></div>
+      </div>
+
+      <div class="grid two">
+        <div class="card"><h2>Devices</h2><div id="devices"></div></div>
+        <div class="card"><h2>How people found Redio Life</h2><div id="sources"></div></div>
+      </div>
+
+      <div class="grid two">
+        <div class="card"><h2>How long people stay on a station</h2><div id="stay"></div></div>
+        <div class="card"><h2>Streams that failed to play</h2><div id="fails"></div></div>
+      </div>
+    </div>
+    <footer><span id="updated"></span> · Refreshes every 20 seconds · <button class="link" id="logout">Forget key on this device</button></footer>
+  </div>
+</main>
+<script src="dashboard.js"></script>
+</body>
+</html>

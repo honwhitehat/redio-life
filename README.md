@@ -7,12 +7,17 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front. *R
 - **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
 - **Across Nigeria:** 252 stations from 27 states, grouped by region and state
 - Favourites, search by name, town, state or frequency, previous/next, and scan
+- 13 colour themes under the radio: the classic walnut radio, Match my phone, Hacker Green, an easy-to-read Classic Blue, Social Glow and more
 - Add your own station, or paste a stream link for one, saved on your phone
 - Works as an installable web app, and as an Android app that wraps this site
 
 ## How it works
 
 Redio Life plays each station's own public online stream, straight from that station's streaming server. It doesn't record, copy or re-host any audio. The station list and its stream links are in [`stations.js`](stations.js).
+
+## Listener counts
+
+To know how many people listen, the app tells a small counter which station is on, once it has played for 15 seconds and then once a minute while it plays. The radio shows how many people are listening now and how many have used it. There are no cookies and no IP addresses are kept; the only thing saved on your phone is a yes/no that it's been counted as a user. Visitors are told apart for one day only and can't be followed from day to day. See [`worker/README.md`](worker/README.md) for exactly what's counted.
 
 ## Disclaimer
 

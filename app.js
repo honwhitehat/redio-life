@@ -150,6 +150,7 @@ function saveLive() { store.set('starlite-live', { id: sel ? sel.id : null, v: v
 const playable = s => s.urls.length > 0;
 
 function connect(s) {
+  if (s !== counted) stopCount();
   current = s;
   if (!s) { player.pause(); player.removeAttribute('src'); player.load(); status = ''; update(); return; }
   status = 'connecting';
@@ -159,14 +160,72 @@ function connect(s) {
   setMediaSession(s);
   update();
 }
-player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); } });
+player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); startCount(current); } });
 player.addEventListener('waiting', () => { if (current) { status = 'buffering'; update(); } });
 player.addEventListener('error', () => {
   if (!current || !player.getAttribute('src')) return;
   const s = current; s.ui++;
   if (s.ui < s.urls.length) connect(s);            // try the next link for this station
-  else { s.dead = true; status = 'unavailable'; update(); }
+  else { s.dead = true; status = 'unavailable'; update(); stopCount(); hit('fail', s); }
 });
+
+/* ---------- Listener counts for the dashboard (dashboard.html, counted by worker/) ----------
+   A station counts as played once it has been on for 15 seconds, so Scan's 12-second stops don't count,
+   and then the app checks in every minute while it plays. No cookies; the id below is made fresh each
+   time the app opens. The only thing kept on the phone is a yes/no that it's been counted as a user. */
+const STATS_URL = location.hostname === 'radio.cybergistplanet.com' ? '/api/hit' : '';
+// A random UUID v4 for this visit; older Android WebViews without randomUUID build one from getRandomValues
+const visitId = crypto.randomUUID ? crypto.randomUUID() : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
+  c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+let counted = null, countTimer = 0, beatTimer = 0;
+function hit(t, s, more, beacon) {
+  if (!STATS_URL) return;
+  const body = JSON.stringify({ t, sid: visitId, ...(s && { id: s.custom ? 'custom' : s.id }), ...more });
+  try {
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon(STATS_URL, body);
+    else fetch(STATS_URL, { method: 'POST', body, keepalive: true, credentials: 'omit' }).catch(() => {});
+  } catch (e) {}
+}
+function startCount(s) {
+  if (counted === s || countTimer) return;
+  countTimer = setTimeout(() => {
+    countTimer = 0;
+    if (current !== s || !on) return;
+    counted = s; hit('play', s);
+    beatTimer = setInterval(() => hit('beat', s), 60000);
+  }, 15000);
+}
+function stopCount(beacon) {
+  clearTimeout(countTimer); countTimer = 0;
+  if (!counted) return;
+  clearInterval(beatTimer); hit('stop', counted, {}, beacon); counted = null;
+}
+addEventListener('pagehide', () => stopCount(true));
+{
+  let ref = '';
+  try { ref = new URL(document.referrer).hostname; } catch (e) {}
+  const first = !store.get('redio-counted', false);
+  hit('visit', null, { ref: ref === location.hostname ? '' : ref, ...(first && { first: 1 }) });
+  if (first && STATS_URL) store.set('redio-counted', true);
+}
+// Listening now and users all time, under the dial; refreshed every 2 minutes while the app is on screen
+const countsEl = $('counts');
+async function showCounts() {
+  if (!STATS_URL || document.hidden) return;
+  try {
+    const r = await fetch('/api/public', { credentials: 'omit' });
+    if (!r.ok) return;
+    const { live, users } = await r.json();
+    if (typeof live !== 'number' || typeof users !== 'number') return;
+    const n = x => x.toLocaleString('en-NG');
+    $('liveCount').textContent = n(live);
+    $('userCount').textContent = n(users);
+    countsEl.hidden = false;
+  } catch (e) {}
+}
+showCounts();
+setInterval(showCounts, 120000);
+document.addEventListener('visibilitychange', showCounts);
 
 function play(s) {
   if (!s) return;
@@ -425,6 +484,15 @@ $('sheetForm').addEventListener('submit', e => {
 render();
 update();
 findStreams();
+/* Colour themes (the list and applyTheme are in theme.js) */
+{
+  const pick = $('themePick'), dark = matchMedia('(prefers-color-scheme: dark)');
+  THEMES.forEach(([k, label]) => pick.appendChild(new Option(label, k)));
+  pick.value = store.get('redio-theme', 'classic');
+  if (!pick.value) pick.value = 'classic';
+  pick.addEventListener('change', () => { store.set('redio-theme', pick.value); applyTheme(pick.value); });
+  dark.addEventListener('change', () => applyTheme(pick.value));   // "Match my phone" switches as the phone does
+}
 /* Updates: check whenever the app comes back to the front, and switch to a new version once the radio is off */
 let updateReady = false;
 function applyUpdate() { if (updateReady && !on) location.reload(); }
