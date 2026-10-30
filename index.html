@@ -175,6 +175,13 @@ details.more .grid{margin-top:8px}
 .about h2{margin:18px 0 4px;font:400 20px Limelight,Georgia,serif;letter-spacing:.02em}
 .about h2:first-child{margin-top:0}
 .about p{margin:0}
+/* How to use: one line above the radio that opens when tapped */
+.howto{width:min(100%,680px);color:var(--hint);font-size:17px;line-height:1.35;text-align:center}
+.howto summary{cursor:pointer;font:400 18px Limelight,Georgia,serif;letter-spacing:.02em;list-style:none;padding:4px 0}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary::before{content:"ⓘ ";font-family:"Barlow Condensed","Arial Narrow",sans-serif}
+.howto[open] summary{margin-bottom:6px}
+.howto p{margin:0 auto;max-width:46ch}
 .toast{
   position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);
   max-width:calc(100% - 32px);padding:10px 16px;border-radius:10px;background:#2C1B0F;color:var(--glow);
@@ -242,6 +249,10 @@ details.more .grid{margin-top:8px}
 </head>
 <body>
 <main class="room">
+  <details class="howto">
+    <summary>How to use Redio Life</summary>
+    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
+  </details>
   <div class="radio" id="radio" data-on="false">
     <div class="frame">
       <div class="face">
@@ -310,8 +321,6 @@ details.more .grid{margin-top:8px}
   </dialog>
   <label class="theme-pick">Colour <select id="themePick"></select></label>
   <section class="about">
-    <h2>How to use Redio Life</h2>
-    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
     <h2>Uses data</h2>
     <p>Stations stream over the internet, so they use your data or Wi‑Fi.</p>
     <h2>Disclaimer</h2>
