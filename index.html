@@ -23,42 +23,49 @@
   --walnut:#6A4426; --walnut-dark:#3B2414; --walnut-light:#8A5C35;
   --ink:#2C1B0F; --brass:#D2AA62; --brass-dark:#7A5A26;
   --eye:#5DF08C; --hint:#F4EEDF; --amber:#E9C77A; --glow:#F3DC9B; --label:#EED9A8; --brass-hi:#F3DCA4;
+  /* The dial window (off, and lit when playing), the keys and the frame round the dial */
+  --face:#B8AC8C; --lit-1:#FFF0C2; --lit-2:#F3CD6E; --lit-3:#D9A445; --lit-glow:rgba(255,170,40,.55);
+  --key-1:#FBF4E2; --key-2:#D8C9A4; --key-edge:#8A7752; --key-ink:var(--ink); --frame-hi:#EBCB86; --cap-1:#F8E7BC; --cap-2:#B88E46;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
+  :root:not([data-theme]){ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 }
 :root[data-theme="dark"]{ --wall:#1F2C2A; --wall-shade:#141D1C; --hint:#CFC6B2; }
 /* Colour themes, picked under the radio (theme.js). Each recolours the wall, the cabinet, the brass and the labels. */
 :root[data-theme="hacker"]{ --wall:#050A05; --wall-shade:#000000; --walnut-light:#0F2A12; --walnut:#0A1A0C; --walnut-dark:#000000;
-  --brass:#00FF41; --brass-dark:#00802B; --brass-hi:#B3FFC6; --amber:#39FF88; --glow:#CCFFD8; --label:#9CFFB4; --hint:#7CFF9E; --eye:#00FF41; }
+  --brass:#00FF41; --brass-dark:#00802B; --brass-hi:#B3FFC6; --amber:#39FF88; --glow:#CCFFD8; --label:#9CFFB4; --hint:#7CFF9E; --eye:#00FF41;
+  --key-1:#0B1F0E; --key-2:#041004; --key-edge:#00802B; --key-ink:#39FF88; --frame-hi:#6CFF9A; --lit-1:#0C3A14; --lit-2:#082A0E; --lit-3:#031203; --cap-1:#2BD45A; --cap-2:#0A3A12; }
 :root[data-theme="hacker"] .now-name, :root[data-theme="hacker"] .now-line, :root[data-theme="hacker"] .find{font-family:"Courier New",Courier,monospace;letter-spacing:-.02em}
 :root[data-theme="hacker"] .face{background:#031203;box-shadow:inset 0 3px 10px #000,inset 0 0 0 1px #0A3A12}
 :root[data-theme="hacker"] .radio[data-on="true"] .face{background:radial-gradient(ellipse at 50% 65%,#0C3A14,#031203);box-shadow:inset 0 3px 10px #000,inset 0 0 30px rgba(0,255,65,.25)}
 :root[data-theme="hacker"] .now{color:#7CFF9E;text-shadow:0 0 6px rgba(0,255,65,.45)}
 :root[data-theme="hacker"] .badge{color:#00C832}
+:root[data-theme="hacker"] .tile.current .play{color:#7CFF9E}
+:root[data-theme="hacker"] .tile.current .eq i{background:#7CFF9E}
 /* Easy to read: the clean blue and white of the big social sites */
 :root[data-theme="blue"]{ --wall:#F0F2F5; --wall-shade:#DCE3EC; --walnut-light:#246CCF; --walnut:#1A5FC0; --walnut-dark:#0B3A75;
-  --brass:#CFE3FF; --brass-dark:#3D6FB8; --brass-hi:#FFFFFF; --amber:#BFDCFF; --glow:#FFFFFF; --label:#F2F7FF; --hint:#1C2B39; }
-/* Purple and pink like a photo app, with a short-video app's cyan */
-:root[data-theme="social"]{ --wall:#0B0B10; --wall-shade:#050507; --walnut-light:#833AB4; --walnut:#B0307F; --walnut-dark:#14081A;
-  --brass:#25F4EE; --brass-dark:#0E8E8A; --brass-hi:#C8FFFD; --amber:#FF8FB0; --glow:#FFFFFF; --label:#FFEAF4; --hint:#E8D9F2; }
-:root[data-theme="midnight"]{ --wall:#141B33; --wall-shade:#0B1020; --walnut-light:#24305A; --walnut:#161E36; --walnut-dark:#0B1020;
-  --brass:#8AA4FF; --brass-dark:#3B4C8F; --amber:#B4C4FF; --glow:#E8ECFF; --label:#D4DCFF; --hint:#C9D2F5; }
-:root[data-theme="green"]{ --wall:#0E2418; --wall-shade:#06170E; --walnut-light:#1C4A30; --walnut:#0E2A1A; --walnut-dark:#06170E;
-  --brass:#2FBF71; --brass-dark:#146B3D; --amber:#7CDFA6; --glow:#E8F8EE; --label:#CDEFDB; --hint:#BFE6CF; }
+  --brass:#CFE3FF; --brass-dark:#3D6FB8; --brass-hi:#FFFFFF; --amber:#BFDCFF; --glow:#FFFFFF; --label:#F2F7FF; --hint:#1C2B39; 
+  --face:#C9DAF0; --lit-1:#FFFFFF; --lit-2:#D6E7FF; --lit-3:#93BDF2; --lit-glow:rgba(120,170,255,.45); --key-1:#FFFFFF; --key-2:#D9E6F6; --key-edge:#5E82B5; --frame-hi:#E3EEFF; --cap-1:#FFFFFF; --cap-2:#9DB9E0; }
+/* Naija Green: green-white-green. A white room, a green cabinet, a white dial, and the flag round the dial */
+:root[data-theme="green"]{ --wall:#F7FBF8; --wall-shade:#E1F0E7; --walnut-light:#008751; --walnut:#007A49; --walnut-dark:#00452A;
+  --brass:#FFFFFF; --brass-dark:#006B40; --brass-hi:#FFFFFF; --amber:#A6EBC6; --glow:#FFFFFF; --label:#FFFFFF; --hint:#0B3D25; --eye:#2FE07F;
+  --face:#EEF8F2; --lit-1:#FFFFFF; --lit-2:#DDF6E8; --lit-3:#9FE3BD; --lit-glow:rgba(0,200,100,.35);
+  --key-1:#FFFFFF; --key-2:#E1F1E7; --key-edge:#3F8A61; --frame-hi:#FFFFFF; --cap-1:#FFFFFF; --cap-2:#9FD8B8; }
+:root[data-theme="green"] .frame{background:linear-gradient(90deg,#008751 0 33.4%,#FFFFFF 33.4% 66.6%,#008751 66.6%)}
+:root[data-theme="green"] .badge{color:#008751}
 :root[data-theme="sunset"]{ --wall:#2A1420; --wall-shade:#1C0E14; --walnut-light:#4A2434; --walnut:#2E1620; --walnut-dark:#1C0E14;
-  --brass:#FB923C; --brass-dark:#9A4A12; --amber:#FDBA74; --glow:#FFF1E6; --label:#FFDCC2; --hint:#F5D5C0; }
-:root[data-theme="teal"]{ --wall:#0D2629; --wall-shade:#071A1C; --walnut-light:#1A4246; --walnut:#0F2A2D; --walnut-dark:#071A1C;
-  --brass:#14B8A6; --brass-dark:#0B6B61; --amber:#5EEAD4; --glow:#E6FAF8; --label:#C5F1EC; --hint:#B8E6E1; }
-:root[data-theme="ember"]{ --wall:#261111; --wall-shade:#1A0B0B; --walnut-light:#4A2222; --walnut:#2A1414; --walnut-dark:#1A0B0B;
-  --brass:#F2606B; --brass-dark:#8C1C25; --amber:#FF8A93; --glow:#FDECEC; --label:#F8CFCF; --hint:#EFC4C4; }
-:root[data-theme="lime"]{ --wall:#18200D; --wall-shade:#0F1408; --walnut-light:#2E3D1C; --walnut:#1B2410; --walnut-dark:#0F1408;
-  --brass:#A3E635; --brass-dark:#557A16; --amber:#C8F27A; --glow:#F3FBE6; --label:#DDEFC4; --hint:#D2E6B5; }
-/* Light rooms: the wall goes light, the radio stays a wood or slate that carries light labels */
-:root[data-theme="sand"]{ --wall:#FAF6F0; --wall-shade:#EFE6D8; --walnut-light:#8C5C2E; --walnut:#7E5228; --walnut-dark:#3F2812;
-  --brass:#F5B544; --brass-dark:#9A5205; --amber:#FCD08A; --glow:#FFF4E0; --label:#FFF0D9; --hint:#292018; }
-:root[data-theme="light"]{ --wall:#F7F7F5; --wall-shade:#E4E4DF; --walnut-light:#5E6872; --walnut:#454E58; --walnut-dark:#22282E;
-  --brass:#93C5FD; --brass-dark:#1E40AF; --amber:#BFDBFE; --glow:#F1F5F9; --label:#E2E8F0; --hint:#1F2937; }
+  --brass:#FB923C; --brass-dark:#9A4A12; --amber:#FDBA74; --glow:#FFF1E6; --label:#FFDCC2; --hint:#F5D5C0; --brass-hi:#FFD3A8;
+  --face:#E9CDB6; --lit-1:#FFF1E0; --lit-2:#FDBA74; --lit-3:#F08A3C; --lit-glow:rgba(251,146,60,.5);
+  --key-1:#FFF4EA; --key-2:#EBCBB3; --key-edge:#9A5A3A; --frame-hi:#FFD3A8; --cap-1:#FFE7D1; --cap-2:#D08850; }
+/* Day and Night, which Match my phone switches between */
+:root[data-theme="day"]{ --wall:#F7F7F5; --wall-shade:#E4E4DF; --walnut-light:#5E6872; --walnut:#454E58; --walnut-dark:#22282E;
+  --brass:#93C5FD; --brass-dark:#1E40AF; --brass-hi:#E5EEF9; --amber:#BFDBFE; --glow:#F1F5F9; --label:#E2E8F0; --hint:#1F2937;
+  --face:#CDD3DA; --lit-1:#FFFFFF; --lit-2:#E3ECF7; --lit-3:#B9CCE3; --lit-glow:rgba(147,197,253,.5);
+  --key-1:#FFFFFF; --key-2:#D8DEE6; --key-edge:#7D8894; --frame-hi:#E5EEF9; --cap-1:#FFFFFF; --cap-2:#AEB8C4; }
+:root[data-theme="night"]{ --wall:#111418; --wall-shade:#08090B; --walnut-light:#2A2F37; --walnut:#1C2027; --walnut-dark:#0B0D10;
+  --brass:#F2C46D; --brass-dark:#8A6A2A; --brass-hi:#FFE3A6; --amber:#F2C46D; --glow:#F5EBD7; --label:#DAD3C3; --hint:#B9B2A3;
+  --face:#948D7E; --lit-1:#FFE9B8; --lit-2:#E8B85C; --lit-3:#B8862E; --lit-glow:rgba(242,196,109,.4);
+  --key-1:#C9C3B6; --key-2:#9C978B; --key-edge:#4E4A42; --frame-hi:#F7D58E; --cap-1:#FFE9B8; --cap-2:#A8843E; }
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%}
 body{
@@ -89,14 +96,14 @@ body{
 .counts b{font-weight:600;color:var(--glow);font-variant-numeric:tabular-nums;margin-right:4px}
 .counts .live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--eye);box-shadow:0 0 8px var(--eye)}
 /* Now-playing panel */
-.frame{padding:9px;border-radius:14px;background:linear-gradient(180deg,#EBCB86,var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.frame{padding:9px;border-radius:14px;background:linear-gradient(180deg,var(--frame-hi),var(--brass) 40%,var(--brass-dark));box-shadow:0 2px 4px rgba(0,0,0,.4)}
 .face{
   display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;
-  background:#B8AC8C;box-shadow:inset 0 3px 10px rgba(0,0,0,.35);transition:background .6s, box-shadow .6s;
+  background:var(--face);box-shadow:inset 0 3px 10px rgba(0,0,0,.35);transition:background .6s, box-shadow .6s;
 }
 .radio[data-on="true"] .face{
-  background:radial-gradient(ellipse at 50% 65%, #FFF0C2, #F3CD6E 55%, #D9A445);
-  box-shadow:inset 0 3px 10px rgba(0,0,0,.25), inset 0 0 40px rgba(255,170,40,.55);
+  background:radial-gradient(ellipse at 50% 65%, var(--lit-1), var(--lit-2) 55%, var(--lit-3));
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.25), inset 0 0 40px var(--lit-glow);
 }
 .eye{
   --gap:120deg;flex:none;width:52px;height:52px;border-radius:50%;
@@ -123,16 +130,16 @@ body{
 }
 .knob:active{cursor:grabbing}
 .knob::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.17) 0 3deg,transparent 3deg 9deg)}
-.knob .cap{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#F8E7BC,#B88E46)}
+.knob .cap{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--cap-1),var(--cap-2))}
 .knob .mark{position:absolute;left:50%;top:5px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:var(--walnut-dark)}
 .keys{flex:1;display:flex;gap:7px;min-width:0}
 .key{
   flex:1;min-width:0;height:48px;border:none;border-radius:4px 4px 9px 9px;cursor:pointer;
-  font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);
-  background:linear-gradient(#FBF4E2,#D8C9A4);box-shadow:0 5px 0 #8A7752,0 7px 9px rgba(0,0,0,.4);
+  font:600 15px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--key-ink);
+  background:linear-gradient(var(--key-1),var(--key-2));box-shadow:0 5px 0 var(--key-edge),0 7px 9px rgba(0,0,0,.4);
   transition:transform .08s, box-shadow .08s;
 }
-.key:active,.key[aria-pressed="true"]{transform:translateY(4px);box-shadow:0 1px 0 #8A7752,0 2px 4px rgba(0,0,0,.4)}
+.key:active,.key[aria-pressed="true"]{transform:translateY(4px);box-shadow:0 1px 0 var(--key-edge),0 2px 4px rgba(0,0,0,.4)}
 .key.wide{flex:1.4}
 .key.power{flex:1.3;background:linear-gradient(#C9493D,#8F2B22);color:#FBEBD5;box-shadow:0 5px 0 #5A1A14,0 7px 9px rgba(0,0,0,.4)}
 .key.power[aria-pressed="true"]{box-shadow:0 1px 0 #5A1A14,0 2px 4px rgba(0,0,0,.4)}
@@ -162,7 +169,7 @@ body{
   background:none;color:rgba(233,199,122,.5);font-size:20px;line-height:1;
 }
 .tile .star[aria-pressed="true"]{color:#FFD45C}
-.tile.current .play{background:radial-gradient(ellipse at 50% 65%, #FFF0C2, #F3CD6E 55%, #D9A445);color:var(--ink);box-shadow:inset 0 2px 5px rgba(0,0,0,.25),0 0 0 2px #FFE08A}
+.tile.current .play{background:radial-gradient(ellipse at 50% 65%, var(--lit-1), var(--lit-2) 55%, var(--lit-3));color:var(--ink);box-shadow:inset 0 2px 5px rgba(0,0,0,.25),0 0 0 2px var(--brass-hi)}
 .tile.current .star{color:rgba(44,27,15,.45)}
 .tile.current .star[aria-pressed="true"]{color:#8F2B22}
 .tile.down .play span::after{content:" · down";opacity:.8}
