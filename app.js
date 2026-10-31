@@ -501,7 +501,8 @@ findStreams();
 {
   const pick = $('themePick'), dark = matchMedia('(prefers-color-scheme: dark)');
   THEMES.forEach(([k, label]) => pick.appendChild(new Option(label, k)));
-  pick.value = store.get('redio-theme', 'classic');
+  const saved = store.get('redio-theme', 'classic');
+  pick.value = OLD_THEMES[saved] || saved;   // e.g. Midnight is now Night
   if (!pick.value) pick.value = 'classic';
   pick.addEventListener('change', () => { store.set('redio-theme', pick.value); applyTheme(pick.value); });
   dark.addEventListener('change', () => applyTheme(pick.value));   // "Match my phone" switches as the phone does
