@@ -4,8 +4,8 @@ A retro-style radio for live Nigerian stations, with a Lagos corner up front. *R
 
 **Listen:** https://radio.cybergistplanet.com/
 
-- **Lagos corner:** 50 Lagos FM stations and 76 Lagos online stations
-- **Across Nigeria:** 252 stations from 27 states, grouped by region and state
+- **Lagos corner:** 50 Lagos FM stations and 79 Lagos online stations
+- **Across Nigeria:** 405 stations from 32 states and Abuja, grouped by region and state, plus Nigerian online stations
 - Favourites, search by name, town, state or frequency, previous/next, and scan
 - 8 colour themes under the radio: the classic walnut radio, Match my phone, Day, Night, Naija Green, Hacker Green, Classic Blue and Lagos Sunset
 - Add your own station, or paste a stream link for one, saved on your phone
@@ -25,7 +25,7 @@ Redio Life isn't affiliated with any of the stations it lists. All programmes, s
 
 If you run a station and want it removed, or its details corrected, please [open an issue](https://github.com/honwhitehat/redio-life/issues) and it will be sorted out promptly.
 
-Stream links were checked in October 2026. Stations sometimes change their links, so some may stop working until they're updated.
+Stream links were checked in October 2026, and the stations added in November 2026 were checked when they were added. The counter also checks every station about every 2 hours. Stations sometimes change their links, so some may stop working until they're updated.
 
 ## Credits
 
