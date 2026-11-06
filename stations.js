@@ -31,7 +31,7 @@ const LAGOS_FM = [
   {"f":95.3,"name":"RadioNow","links":["https://radionow-atunwadigital.streamguys1.com/radionow"]},
   {"f":95.7,"name":"LASU Radio"},
   {"f":96.1,"name":"Lagos Traffic Radio"},
-  {"f":96.5,"name":"Urban96"},
+  {"f":96.5,"name":"Urban96","links":["https://stream.group8.africa/urban96fmlag"]},
   {"f":96.7,"name":"Irawo FM","links":["https://stream.group8.africa/irawofmlag"]},
   {"f":96.9,"name":"Cool FM","links":["https://coolfmlagos969-atunwadigital.streamguys1.com/coolfmlagos969"]},
   {"f":97.1,"name":"Citizens Voice 97.1FM","links":["https://stream3.voltsradio.com/listen/citizens_voice/radio.mp3"]},
