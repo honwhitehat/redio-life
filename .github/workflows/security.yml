@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: pipx install semgrep
       - run: semgrep scan --config auto --sarif --output semgrep.sarif || true
-      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
+      - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v3
         if: ${{ hashFiles('semgrep.sarif') != '' }}
         with:
           sarif_file: semgrep.sarif
@@ -43,7 +43,7 @@ jobs:
         run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
       - name: Dependency & config scan
         run: trivy fs --scanners vuln,secret,misconfig --format sarif --output trivy.sarif --exit-code 0 .
-      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
+      - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v3
         if: ${{ hashFiles('trivy.sarif') != '' }}
         with:
           sarif_file: trivy.sarif
@@ -60,7 +60,7 @@ jobs:
           python-version: '3.12'
       - run: pip install checkov
       - run: checkov -d . --soft-fail -o sarif --output-file-path . || true
-      - uses: github/codeql-action/upload-sarif@ce5e7eeac396d720fe2d802714996c8ce561e311 # v3
+      - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v3
         if: ${{ hashFiles('results_sarif.sarif') != '' }}
         with:
           sarif_file: results_sarif.sarif
