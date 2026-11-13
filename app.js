@@ -149,25 +149,56 @@ let page = store.get('starlite-page', 'lagos') === 'nigeria' ? 'nigeria' : 'lago
 function saveLive() { store.set('starlite-live', { id: sel ? sel.id : null, v: volume }); }
 const playable = s => s.urls.length > 0;
 
-function connect(s) {
+/* Phone networks drop live streams often. A station that has played is reconnected on the same link
+   (6 tries over about 45 seconds) instead of being given up on, and a stream that stops moving is restarted. */
+let played = false, retries = 0, retryTimer = 0, lastTime = -1, stuck = 0;
+function connect(s, again) {
   if (s !== counted) stopCount();
+  clearTimeout(retryTimer); retryTimer = 0; stuck = 0; lastTime = -1;
+  if (!again) { played = false; retries = 0; }
   current = s;
   if (!s) { player.pause(); player.removeAttribute('src'); player.load(); status = ''; update(); return; }
-  status = 'connecting';
+  status = again ? 'reconnecting' : 'connecting';
   player.src = s.urls[s.ui % s.urls.length];
   player.volume = volume * volume;
   player.play().catch(() => {});
   setMediaSession(s);
   update();
 }
-player.addEventListener('playing', () => { if (current) { status = 'playing'; update(); startCount(current); } });
-player.addEventListener('waiting', () => { if (current) { status = 'buffering'; update(); } });
-player.addEventListener('error', () => {
-  if (!current || !player.getAttribute('src')) return;
+function giveUp(s) {
+  player.pause(); player.removeAttribute('src'); player.load();   // so a late start can't play under "down"
+  s.dead = true; status = 'unavailable'; update(); stopCount(); hit('fail', s);
+}
+function reconnect() {
+  const s = current;
+  if (!s || !on) return;
+  if (retries >= 6) return giveUp(s);
+  status = 'reconnecting'; update();
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(() => { if (current === s && on) connect(s, true); }, Math.min(1000 * 2 ** retries++, 15000));
+}
+function failed() {   // this link didn't work
+  if (!current || !on || !player.getAttribute('src')) return;
+  if (played) return reconnect();                // it was playing, so the link is good: the connection dropped
   const s = current; s.ui++;
-  if (s.ui < s.urls.length) connect(s);            // try the next link for this station
-  else { s.dead = true; status = 'unavailable'; update(); stopCount(); hit('fail', s); }
-});
+  if (s.ui < s.urls.length) connect(s);          // try the next link for this station
+  else giveUp(s);
+}
+player.addEventListener('playing', () => { if (current) { played = true; retries = 0; status = 'playing'; update(); startCount(current); } });
+player.addEventListener('waiting', () => { if (current && status !== 'reconnecting') { status = 'buffering'; update(); } });
+player.addEventListener('error', failed);
+player.addEventListener('ended', failed);        // a live stream only "ends" when the station's server cuts it off
+// Every 3 seconds, check the sound is still moving: 12 seconds stuck after playing, or 25 seconds without starting
+setInterval(() => {
+  // Skip while a retry is waiting, and while the phone has paused the sound itself (a call, say)
+  if (!on || !current || retryTimer || status === 'unavailable' || player.paused && status === 'playing') { stuck = 0; return; }
+  const t = player.currentTime;
+  stuck = t > lastTime ? 0 : stuck + 3;
+  lastTime = t;
+  if (stuck >= (played ? 12 : 25)) { stuck = 0; failed(); }
+}, 3000);
+// Back online after a dropout: try again straight away
+addEventListener('online', () => { if (on && current && status !== 'playing') { retries = 0; connect(current, true); } });
 
 /* ---------- Listener counts for the dashboard (dashboard.html, counted by worker/) ----------
    A station counts as played once it has been on for 15 seconds, so Scan's 12-second stops don't count,
@@ -271,6 +302,7 @@ function update() {
     : status === 'playing' ? `${where} · live`
     : status === 'buffering' ? `${where} · buffering…`
     : status === 'unavailable' ? `${where} · stream is down right now`
+    : status === 'reconnecting' ? `${where} · signal dropped, reconnecting…`
     : `${where} · connecting…`;
   eye.style.setProperty('--gap', (status === 'playing' ? 6 : status === 'unavailable' ? 120 : 70) + 'deg');
   volKnob.style.transform = `rotate(${-135 + volume * 270}deg)`;
