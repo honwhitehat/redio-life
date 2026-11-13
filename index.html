@@ -6,6 +6,19 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Redio Life · Nigerian radio</title>
+<meta name="description" content="Listen live to 500+ Nigerian radio stations on your phone: Lagos FM, campus radio and stations from across Nigeria. Free, no sign-up.">
+<link rel="canonical" href="https://radio.cybergistplanet.com/">
+<!-- The preview card WhatsApp, Facebook and X show when someone shares a link -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Redio Life">
+<meta property="og:title" content="Redio Life · Live Nigerian radio">
+<meta property="og:description" content="500+ Nigerian radio stations, live on your phone. Lagos FM, campus radio and stations from across Nigeria.">
+<meta property="og:url" content="https://radio.cybergistplanet.com/">
+<meta property="og:image" content="https://radio.cybergistplanet.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A retro radio and the words Redio Life, live Nigerian radio">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#3B2414">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -265,7 +278,7 @@ details.more .grid{margin-top:8px}
 <main class="room">
   <details class="howto">
     <summary>How to use Redio Life</summary>
-    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
+    <p>Tap a station to play, tap again to stop. ☆ saves it to Favourites. Lagos Corner has Lagos stations; Across Nigeria has the rest by state. Share sends a link that opens the station you're on. ◀ ▶ skip stations, Scan plays each for 12 seconds, and + Add lets you add a station or stream link.</p>
   </details>
   <div class="radio" id="radio" data-on="false">
     <div class="frame">
@@ -297,6 +310,7 @@ details.more .grid{margin-top:8px}
     </div>
     <div class="tools">
       <input class="find" id="find" type="search" placeholder="Find a station, town or frequency" autocomplete="off" aria-label="Find a station">
+      <button class="key" id="shareBtn">Share</button>
       <button class="key" id="addBtn">+ Add</button>
     </div>
     <div class="tabs" role="tablist">

@@ -146,6 +146,13 @@ let page = store.get('starlite-page', 'lagos') === 'nigeria' ? 'nigeria' : 'lago
     sel = (saved.id && byId(saved.id)) || (typeof saved.f === 'number' && byF(saved.f)) || null;
   }
 }
+// A shared link (?s=lagos:89.5) opens on that station. Phones don't let a page start sound by itself,
+// so it's lined up on the dial and plays at the first tap of On / off.
+const shared = byId(new URLSearchParams(location.search).get('s'));
+if (shared) {
+  sel = shared; page = shared.page;
+  history.replaceState(null, '', location.pathname);   // so a reload or an installed app doesn't keep reopening it
+}
 function saveLive() { store.set('starlite-live', { id: sel ? sel.id : null, v: volume }); }
 const playable = s => s.urls.length > 0;
 
@@ -481,9 +488,24 @@ $('sheetForm').addEventListener('submit', e => {
   });
 });
 
+/* ---------- Share: the station you're on, or the radio itself ---------- */
+const SITE = 'https://radio.cybergistplanet.com/';
+const shareLink = s => s && !s.custom ? `${SITE}?s=${encodeURIComponent(s.id).replace(/%3A/g, ':')}` : SITE;
+$('shareBtn').addEventListener('click', async () => {
+  const s = sel && !sel.custom ? sel : null, url = shareLink(s);
+  const text = s ? `Listen to ${s.name}${s.f && !s.name.includes(String(s.f)) ? ' ' + fm(s) : ''} live on Redio Life 📻` : 'Listen to Nigerian radio live on Redio Life 📻';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Redio Life', text, url }); return; }
+    catch (e) { if (e.name === 'AbortError') return; }   // they closed the share sheet
+  }
+  try { await navigator.clipboard.writeText(`${text} ${url}`); toast('Link copied. Paste it into WhatsApp or anywhere'); }
+  catch (e) { toast(url); }
+});
+
 render();
 update();
 findStreams();
+if (shared) toast(`Tap On / off to play ${shared.name}`);
 /* Full dashboard: opens on top of the radio instead of leaving the page, so the station keeps playing */
 {
   const sheet = $('dashSheet'), frame = $('dashFrame');
